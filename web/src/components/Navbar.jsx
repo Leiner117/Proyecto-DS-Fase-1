@@ -4,26 +4,47 @@ import styled from 'styled-components';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [language, setLanguage] = useState('Es');
   const location = useLocation();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    closeMenu();
+  };
+
   return (
     <Nav>
-      <Logo href="/">
-        <img src="https://www.pngkit.com/png/detail/957-9571575_we-will-back-promising-housing-ideas-allowing-them.png" alt="Logo" />
-      </Logo>
       <Hamburger onClick={toggleMenu}>
         <span />
         <span />
         <span />
       </Hamburger>
       <Menu isOpen={isOpen}>
-        <MenuLink to="/" isActive={location.pathname === '/'}>Inicio</MenuLink>
-        <MenuLink to="/explorarmapa" isActive={location.pathname === '/explorarmapa'}>ExplorarMapa</MenuLink>
-        <MenuLink to="/buscarrecetas" isActive={location.pathname === '/buscarrecetas'}>BuscarRecetas</MenuLink>
+        <MenuLink to="/" isActive={location.pathname === '/'} onClick={closeMenu}>Inicio</MenuLink>
+        <MenuLink to="/explorarmapa" isActive={location.pathname === '/explorarmapa'} onClick={closeMenu}>Explorar Mapa</MenuLink>
+        <MenuLink to="/buscarrecetas" isActive={location.pathname === '/buscarrecetas'} onClick={closeMenu}>Buscar Recetas</MenuLink>
+        <LanguageSelector>
+          <LanguageOption 
+            selected={language === 'Es'} 
+            onClick={() => handleLanguageChange('Es')}
+          >
+            Es
+          </LanguageOption>
+          <LanguageOption 
+            selected={language === 'En'} 
+            onClick={() => handleLanguageChange('En')}
+          >
+            En
+          </LanguageOption>
+        </LanguageSelector>
       </Menu>
       <LoginIcon href="/login">
         <img src="https://www.pngkit.com/png/full/940-9406687_already-a-proact-user-employee-icon-white-png.png" alt="Login Icon" />
@@ -45,17 +66,9 @@ const Nav = styled.nav`
   position: fixed;
   width: 100%;
   top: 0;
-  z-index: 1000;    
-`;
-
-const Logo = styled.a`
-  display: flex;
-  align-items: center;
-
-  img {
-    height: 30px;
-    wedth: 30px;
-  }
+  z-index: 1000;
+  box-sizing: border-box;
+  left: 0; /* Asegura que el navbar no tenga margen izquierdo */
 `;
 
 const Hamburger = styled.div`
@@ -79,6 +92,7 @@ const Hamburger = styled.div`
 const Menu = styled.div`
   display: flex;
   gap: 20px;
+  align-items: center;
 
   @media (max-width: 768px) {
     display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
@@ -89,7 +103,7 @@ const Menu = styled.div`
     top: 60px;
     left: 0;
     padding: 10px 0;
-    z-index: 9999; 
+    z-index: 9999;
   }
 `;
 
@@ -114,6 +128,29 @@ const LoginIcon = styled.a`
   align-items: center;
   img {
     height: 30px;
-    wedth: 30px;
+    width: 30px;
   }
 `;
+
+const LanguageSelector = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    width: 100%;
+  }
+`;
+
+const LanguageOption = styled.span`
+  cursor: ${({ selected }) => (selected ? 'default' : 'pointer')};
+  font-size: 1.2rem;
+  color: ${({ selected }) => (selected ? '#f0a500' : 'white')};
+
+  &:hover {
+    color: ${({ selected }) => (selected ? '#f0a500' : '#f0a500')};
+  }
+`;
+
