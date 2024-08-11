@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Card = ({ image, title, country }) => {
+const Card = ({ image, title, country,onClick }) => {
   return (
-    <CardContainer>
+    <CardContainer onClick={onClick}>
       <Image src={image} alt={title} />
       <Content>
         <Title>{title}</Title>
