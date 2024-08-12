@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Card from '../components/Card';
 import Modal from '../components/Modal';
@@ -8,26 +8,31 @@ const SearchRecipes = () => {
   const [filter, setFilter] = useState('name');
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
-  useEffect(() => {
-    const fetchRecipes = async () => {
+  const handleSearch = async () => {
+    if (filter === 'name' && search.trim() !== '') {
+      setLoading(true);
+      setError(null);
       try {
-        const fetchedRecipes = [];
-        for (let i = 0; i < 10; i++) {
-          const response = await fetch('https://www.themealdb.com/api/json/v1/1/random.php');
-          const data = await response.json();
-          const meal = data.meals[0];
-          fetchedRecipes.push({
-            image: meal.strMealThumb,
-            title: meal.strMeal,
-            country: meal.strArea,
-            instructions: meal.strInstructions
-          });
-        }
+        const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${search}`);
+        const data = await response.json();
+        const fetchedRecipes = data.meals ? data.meals.map(meal => ({
+          image: meal.strMealThumb,
+          title: meal.strMeal,
+          country: meal.strArea,
+          instructions: meal.strInstructions,
+          ingredients: [
+            meal.strIngredient1,
+            meal.strIngredient2,
+            meal.strIngredient3,
+            meal.strIngredient4,
+            meal.strIngredient5,
+          ].filter(Boolean)  // Filtra los ingredientes no nulos
+        })) : [];
         setRecipes(fetchedRecipes);
         setFilteredRecipes(fetchedRecipes);
         setLoading(false);
@@ -35,25 +40,19 @@ const SearchRecipes = () => {
         setError(error);
         setLoading(false);
       }
-    };
-
-    fetchRecipes();
-  }, []);
-
-  const handleSearch = () => {
-    const filtered = recipes.filter((recipe) => {
-      if (filter === 'name') {
-        return recipe.title.toLowerCase().includes(search.toLowerCase());
-      } else if (filter === 'country') {
-        return recipe.country.toLowerCase().includes(search.toLowerCase());
-      } else if (filter === 'include') {
-        return recipe.ingredients.some((ingredient) => ingredient.toLowerCase().includes(search.toLowerCase()));
-      } else if (filter === 'exclude') {
-        return !recipe.ingredients.some((ingredient) => ingredient.toLowerCase().includes(search.toLowerCase()));
-      }
-      return false;
-    });
-    setFilteredRecipes(filtered);
+    } else {
+      const filtered = recipes.filter((recipe) => {
+        if (filter === 'country') {
+          return recipe.country.toLowerCase().includes(search.toLowerCase());
+        } else if (filter === 'include') {
+          return recipe.ingredients.some((ingredient) => ingredient.toLowerCase().includes(search.toLowerCase()));
+        } else if (filter === 'exclude') {
+          return !recipe.ingredients.some((ingredient) => ingredient.toLowerCase().includes(search.toLowerCase()));
+        }
+        return false;
+      });
+      setFilteredRecipes(filtered);
+    }
   };
 
   const handleCardClick = (recipe) => {
@@ -65,9 +64,6 @@ const SearchRecipes = () => {
     setShowModal(false);
     setSelectedRecipe(null);
   };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div>
@@ -86,6 +82,8 @@ const SearchRecipes = () => {
         </select>
         <button type="button" onClick={handleSearch}>Buscar</button>
       </SearchForm>
+      {loading && <div>Loading...</div>}
+      {error && <div>Error: {error.message}</div>}
       <Gallery>
         {filteredRecipes.map((recipe, index) => (
           <Card

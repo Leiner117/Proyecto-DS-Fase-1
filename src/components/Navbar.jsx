@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import LoginAuth from './LoginAuth'; 
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState('Es');
+  const [showUserAuth, setShowUserAuth] = useState(false);
   const location = useLocation();
 
   const toggleMenu = () => {
@@ -20,6 +22,10 @@ const Navbar = () => {
     closeMenu();
   };
 
+  const toggleUserAuth = () => {
+    setShowUserAuth(!showUserAuth);
+  };
+
   return (
     <Nav>
       <Hamburger onClick={toggleMenu}>
@@ -31,6 +37,8 @@ const Navbar = () => {
         <MenuLink to="/" isActive={location.pathname === '/'} onClick={closeMenu}>Inicio</MenuLink>
         <MenuLink to="/explorarmapa" isActive={location.pathname === '/explorarmapa'} onClick={closeMenu}>Explorar Mapa</MenuLink>
         <MenuLink to="/buscarrecetas" isActive={location.pathname === '/buscarrecetas'} onClick={closeMenu}>Buscar Recetas</MenuLink>
+      </Menu>
+      <RightSection>
         <LanguageSelector>
           <LanguageOption 
             selected={language === 'Es'} 
@@ -45,10 +53,11 @@ const Navbar = () => {
             En
           </LanguageOption>
         </LanguageSelector>
-      </Menu>
-      <LoginIcon href="/login">
-        <img src="https://www.pngkit.com/png/full/940-9406687_already-a-proact-user-employee-icon-white-png.png" alt="Login Icon" />
-      </LoginIcon>
+        <LoginIcon onClick={toggleUserAuth}> {}
+          <img src="https://www.pngkit.com/png/full/940-9406687_already-a-proact-user-employee-icon-white-png.png" alt="Login Icon" />
+        </LoginIcon>
+        {showUserAuth && <LoginAuth />} {}
+      </RightSection>
     </Nav>
   );
 };
@@ -69,6 +78,13 @@ const Nav = styled.nav`
   z-index: 1000;
   box-sizing: border-box;
   left: 0; /* Asegura que el navbar no tenga margen izquierdo */
+`;
+
+const RightSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative; /* Para que el AuthContainer esté posicionado relativamente al RightSection */
 `;
 
 const Hamburger = styled.div`
@@ -123,9 +139,11 @@ const MenuLink = styled(Link)`
   }
 `;
 
-const LoginIcon = styled.a`
+const LoginIcon = styled.div`
   display: flex;
   align-items: center;
+  cursor: pointer;
+
   img {
     height: 30px;
     width: 30px;
@@ -136,11 +154,10 @@ const LanguageSelector = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 0;
 
   @media (max-width: 768px) {
     justify-content: center;
-    width: 100%;
+    width: auto; /* Permite que el selector de idioma se ajuste automáticamente */
   }
 `;
 
@@ -153,4 +170,3 @@ const LanguageOption = styled.span`
     color: ${({ selected }) => (selected ? '#f0a500' : '#f0a500')};
   }
 `;
-
