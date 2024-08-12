@@ -15,7 +15,7 @@ const Modal = ({ show, onClose, recipe }) => {
             <InfoText>{recipe.instructions}</InfoText>
           </InfoSection>
         </ImageSection>
-        <AddToFavoritesButton>Agregar a Favoritos</AddToFavoritesButton>
+        <AddToFavoritesButton>Add To My Favorites</AddToFavoritesButton>
       </ModalContent>
     </ModalOverlay>
   );
@@ -71,8 +71,8 @@ const InfoText = styled.p`
 `;
 
 const AddToFavoritesButton = styled.button`
-  margin-top: 20px; /* Espacio separado de la información */
-  background-color: #007bff;
+  margin-top: 20px; 
+  background-color: #f0a500;
   color: white;
   border: none;
   padding: 10px 15px;

@@ -70,10 +70,10 @@ const LoginAuth = () => {
         <>
           <UserInfo>
             <img src={user.photoURL} alt="User Avatar" />
-            <p>Hola, {user.displayName}</p>
+            <p>Welcome, {user.displayName}</p>
           </UserInfo>
           <Button onClick={handleLogout}>Logout</Button>
-          <FavoritesButton onClick={handleViewFavorites}>Ver Recetas Favoritas</FavoritesButton>
+          <FavoritesButton onClick={handleViewFavorites}>My Favorite Recipes</FavoritesButton>
         </>
       ) : (
         <>
@@ -114,7 +114,7 @@ const LoginAuth = () => {
               <ToggleText onClick={() => setIsRegistering(true)}>Don't have an account? Register</ToggleText>
             </>
           )}
-          <Separator>Otros Métodos de Ingreso</Separator>
+          <Separator>Other Ways to LogIn</Separator>
           <Button onClick={handleGoogleLogin}>Sign in with Google</Button>
           <Button onClick={handleFacebookLogin}>Sign in with Facebook</Button>
           <Button onClick={handleMicrosoftLogin}>Sign in with Microsoft</Button>
@@ -158,7 +158,7 @@ const UserInfo = styled.div`
 
 const Button = styled.button`
   padding: 10px 15px;
-  background-color: #4285F4;
+  background-color: #f0a500;
   color: white;
   border: none;
   border-radius: 5px;

@@ -72,15 +72,15 @@ const SearchRecipes = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar recetas..."
+          placeholder="Search Recipes..."
         />
         <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="name">Nombre</option>
-          <option value="country">País</option>
-          <option value="include">Incluir Ingrediente</option>
-          <option value="exclude">Excluir Ingrediente</option>
+          <option value="name">Name</option>
+          <option value="country">Country</option>
+          <option value="include">Include Ingredient</option>
+          <option value="exclude">Exclude Ingredient</option>
         </select>
-        <button type="button" onClick={handleSearch}>Buscar</button>
+        <button type="button" onClick={handleSearch}>Search</button>
       </SearchForm>
       {loading && <div>Loading...</div>}
       {error && <div>Error: {error.message}</div>}

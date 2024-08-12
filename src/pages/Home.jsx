@@ -58,7 +58,7 @@ const Home = () => {
 
   return (
     <HomeContainer>
-      <Title>Nuestras Recetas Recomendadas</Title>
+      <Title>Recomended Recipes</Title>
       <CardSection>
         {recipes.map((recipe, index) => (
           <Card
@@ -71,15 +71,15 @@ const Home = () => {
         ))}
       </CardSection>
 
-      <ObjectiveTitle>Objetivo de Nuestra Web</ObjectiveTitle>
+      <ObjectiveTitle>About Us</ObjectiveTitle>
       <Paragraph>
-        La idea de nuestra página es proporcionar recetas fáciles, rápidas y saludables para estudiantes universitarios. Sabemos que la vida universitaria puede ser agitada y, a menudo, encontrar tiempo para preparar una comida adecuada es un desafío. Por eso, hemos reunido una variedad de recetas que se ajustan a los horarios ocupados y los presupuestos limitados.
+      The idea of our site is to provide easy, quick and healthy recipes for college students. We know that college life can be hectic and often finding time to prepare a proper meal is a challenge. That's why we've put together a variety of recipes to fit busy schedules and limited budgets.
       </Paragraph>
       <Paragraph>
-        Nuestro objetivo es ayudar a los estudiantes a mantener una dieta equilibrada, proporcionando ideas de comidas que no solo son nutritivas, sino que también son fáciles de preparar. Con nuestras recetas, esperamos inspirar a los estudiantes a experimentar en la cocina y descubrir que comer bien no tiene que ser complicado ni costoso.
+      Our goal is to help students maintain a balanced diet by providing meal ideas that are not only nutritious, but also easy to prepare. With our recipes, we hope to inspire students to experiment in the kitchen and discover that eating well doesn't have to be complicated or expensive.
       </Paragraph>
       <Paragraph>
-        Además, muchas de nuestras recetas están diseñadas para ser adaptables, lo que significa que pueden ajustarse según los ingredientes que tengas a mano o las preferencias dietéticas que puedas tener. ¡Nos encanta ayudar a los estudiantes a comer bien y sentirse bien, sin importar su nivel de habilidad en la cocina!
+      Plus, many of our recipes are designed to be adaptable, which means they can be adjusted based on ingredients you have on hand or dietary preferences you may have. We love helping students eat well and feel good, no matter what their skill level in the kitchen!
       </Paragraph>
       
       {/* Modal para mostrar los detalles de la receta seleccionada */}

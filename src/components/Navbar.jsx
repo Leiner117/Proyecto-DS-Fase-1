@@ -34,9 +34,9 @@ const Navbar = () => {
         <span />
       </Hamburger>
       <Menu isOpen={isOpen}>
-        <MenuLink to="/" isActive={location.pathname === '/'} onClick={closeMenu}>Inicio</MenuLink>
-        <MenuLink to="/explorarmapa" isActive={location.pathname === '/explorarmapa'} onClick={closeMenu}>Explorar Mapa</MenuLink>
-        <MenuLink to="/buscarrecetas" isActive={location.pathname === '/buscarrecetas'} onClick={closeMenu}>Buscar Recetas</MenuLink>
+        <MenuLink to="/" isActive={location.pathname === '/'} onClick={closeMenu}>Home</MenuLink>
+        <MenuLink to="/explorarmapa" isActive={location.pathname === '/explorarmapa'} onClick={closeMenu}>Explore Map</MenuLink>
+        <MenuLink to="/buscarrecetas" isActive={location.pathname === '/buscarrecetas'} onClick={closeMenu}>Search Recipes</MenuLink>
       </Menu>
       <RightSection>
         <LanguageSelector>

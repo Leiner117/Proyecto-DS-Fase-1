@@ -67,8 +67,8 @@ const ExploreMap = () => {
         contentLabel="Selected Country"
         style={modalStyles}
       >
-        <h2>{`Has seleccionado ${selectedCountry}`}</h2>
-        <button onClick={closeModal}>Cerrar</button>
+        <h2>{`You have seleted ${selectedCountry}`}</h2>
+        <button onClick={closeModal}>Close</button>
       </Modal>
     </div>
   );
