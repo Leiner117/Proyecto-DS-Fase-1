@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { db, auth } from '../firebaseConfig'; // Asegúrate de que estas rutas estén correctas
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
 
 const FavoriteRecipesContainer = styled.div`
   display: flex;
@@ -41,53 +41,64 @@ const ErrorMessage = styled.p`
   color: red;
   text-align: center;
 `;
-const FavoriteRecipes = ({ user }) => {
+
+const FavoriteRecipes = () => {
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const user = auth.currentUser; // Obtener el usuario autenticado
 
   useEffect(() => {
-    const fetchFavoriteRecipes = async () => {
-      console.log("User:", user); 
+    const fetchFavorites = async () => {
       if (user) {
+        const userId = user.uid;
         try {
-          const recipesRef = collection(db, 'favoriteRecipes');
-          const q = query(recipesRef, where('userId', '==', user.uid));
-          const querySnapshot = await getDocs(q);
-          const recipes = querySnapshot.docs.map(doc => doc.data());
-          setFavoriteRecipes(recipes);
-        } catch (error) {
-          console.error("Error fetching favorite recipes: ", error);
-        } finally {
-          setLoading(false);
+          // Consulta en Firestore para obtener los favoritos del usuario
+          const favoritesQuery = query(
+            collection(db, "favorites"),
+            where("userId", "==", userId)
+          );
+
+          const querySnapshot = await getDocs(favoritesQuery);
+          const recipesData = await Promise.all(querySnapshot.docs.map(async (doc) => {
+            const recipeId = doc.data().recipeId;
+            const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipeId}`);
+            const data = await response.json();
+            return data.meals[0];
+          }));
+
+          setFavoriteRecipes(recipesData);
+        } catch (err) {
+          console.error("Error al obtener las recetas favoritas:", err);
+          setError("Failed to load favorite recipes.");
         }
       } else {
-        setLoading(false);
+        setError("User not logged in.");
       }
     };
 
-    fetchFavoriteRecipes();
+    fetchFavorites();
   }, [user]);
 
-  if (loading) {
-    return <p>Loading favorite recipes...</p>;
-  }
-
-  if (!user) {
-    return <ErrorMessage>You need to log in to view your favorite recipes.</ErrorMessage>;
+  if (error) {
+    return <ErrorMessage>{error}</ErrorMessage>;
   }
 
   return (
     <FavoriteRecipesContainer>
       <UserInfo>
-        <UserAvatar src={user.photoURL} alt="User Avatar" />
-        <p>Welcome, {user.displayName}</p>
+        {user && (
+          <>
+            <UserAvatar src={user.photoURL} alt="User Avatar" />
+            <p>Welcome, {user.displayName}</p>
+          </>
+        )}
       </UserInfo>
 
       <RecipesList>
         {favoriteRecipes.length > 0 ? (
           favoriteRecipes.map((recipe, index) => (
             <RecipeItem key={index}>
-              {recipe.name}
+              {recipe.strMeal}
             </RecipeItem>
           ))
         ) : (
@@ -97,6 +108,5 @@ const FavoriteRecipes = ({ user }) => {
     </FavoriteRecipesContainer>
   );
 };
-
 
 export default FavoriteRecipes;
