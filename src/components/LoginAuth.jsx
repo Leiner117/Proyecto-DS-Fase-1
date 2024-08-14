@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { signInWithGoogle, logOut, auth } from '../firebaseConfig';
 import styled from 'styled-components';
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 const LoginAuth = () => {
   const [user, setUser] = useState(null);
@@ -112,9 +113,9 @@ const LoginAuth = () => {
       console.error("Error during sign out:", error);
     });
   };
-
+  const navigate = useNavigate();
   const handleViewFavorites = () => {
-    console.log('Ver recetas favoritas');
+    navigate('/RecetasFavoritas');
   };
 
   return (
@@ -123,9 +124,11 @@ const LoginAuth = () => {
         <>
           <UserInfo>
             <img src={user.photoURL} alt="User Avatar" />
-            <p>Welcome, {user.displayName}!</p>
+            <p>Welcome, {user.displayName}</p>
           </UserInfo>
-          <FavoritesButton onClick={handleViewFavorites}>My Favorite Recipes</FavoritesButton>
+          <FavoritesButton onClick={handleViewFavorites}>
+            My Favorite Recipes
+          </FavoritesButton>
           <Button onClick={handleLogout}>Logout</Button>
         </>
       ) : (
@@ -161,7 +164,9 @@ const LoginAuth = () => {
               />
               {error && <ErrorText>{error}</ErrorText>}
               <Button onClick={handleRegister}>Sign Up</Button>
-              <ToggleText onClick={() => { setIsRegistering(false); clearFields(); }}>Already have an account? Sign In</ToggleText>
+              <ToggleText onClick={() => { setIsRegistering(false); clearFields(); }}>
+                Already have an account? Sign In
+              </ToggleText>
             </>
           ) : (
             <>
@@ -179,7 +184,9 @@ const LoginAuth = () => {
               />
               {error && <ErrorText>{error}</ErrorText>}
               <Button onClick={handleEmailLogin}>Sign In</Button>
-              <ToggleText onClick={() => { setIsRegistering(true); clearFields(); }}>Don't have an account? Sign Up</ToggleText>
+              <ToggleText onClick={() => { setIsRegistering(true); clearFields(); }}>
+                Don't have an account? Sign Up
+              </ToggleText>
             </>
           )}
           <Separator>Other Ways to Sign In</Separator>
@@ -189,6 +196,7 @@ const LoginAuth = () => {
     </AuthContainer>
   );
 };
+
 
 export default LoginAuth;
 
