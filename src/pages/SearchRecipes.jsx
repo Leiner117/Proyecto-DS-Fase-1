@@ -5,16 +5,19 @@ import Modal from '../components/Modal';
 
 const SearchRecipes = () => {
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('name');
+  const [countryFilter, setCountryFilter] = useState('');
+  const [includeIngredient, setIncludeIngredient] = useState('');
+  const [excludeIngredient, setExcludeIngredient] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   const handleSearch = async () => {
-    if (filter === 'name' && search.trim() !== '') {
+    if (search.trim() !== '') {
       setLoading(true);
       setError(null);
       try {
@@ -31,7 +34,7 @@ const SearchRecipes = () => {
             meal.strIngredient3,
             meal.strIngredient4,
             meal.strIngredient5,
-          ].filter(Boolean)  // Filtra los ingredientes no nulos
+          ].filter(Boolean)
         })) : [];
         setRecipes(fetchedRecipes);
         setFilteredRecipes(fetchedRecipes);
@@ -40,19 +43,34 @@ const SearchRecipes = () => {
         setError(error);
         setLoading(false);
       }
-    } else {
-      const filtered = recipes.filter((recipe) => {
-        if (filter === 'country') {
-          return recipe.country.toLowerCase().includes(search.toLowerCase());
-        } else if (filter === 'include') {
-          return recipe.ingredients.some((ingredient) => ingredient.toLowerCase().includes(search.toLowerCase()));
-        } else if (filter === 'exclude') {
-          return !recipe.ingredients.some((ingredient) => ingredient.toLowerCase().includes(search.toLowerCase()));
-        }
-        return false;
-      });
-      setFilteredRecipes(filtered);
     }
+
+    // Aplicar filtros avanzados sobre los resultados de búsqueda por nombre
+    let filtered = recipes;
+
+    if (countryFilter.trim() !== '') {
+      filtered = filtered.filter(recipe => 
+        recipe.country.toLowerCase().includes(countryFilter.toLowerCase())
+      );
+    }
+
+    if (includeIngredient.trim() !== '') {
+      filtered = filtered.filter(recipe => 
+        recipe.ingredients.some(ingredient => 
+          ingredient.toLowerCase().includes(includeIngredient.toLowerCase())
+        )
+      );
+    }
+
+    if (excludeIngredient.trim() !== '') {
+      filtered = filtered.filter(recipe => 
+        !recipe.ingredients.some(ingredient => 
+          ingredient.toLowerCase().includes(excludeIngredient.toLowerCase())
+        )
+      );
+    }
+
+    setFilteredRecipes(filtered);
   };
 
   const handleCardClick = (recipe) => {
@@ -72,16 +90,46 @@ const SearchRecipes = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search Recipes..."
+          placeholder="Search Recipes by Name..."
         />
-        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="name">Name</option>
-          <option value="country">Country</option>
-          <option value="include">Include Ingredient</option>
-          <option value="exclude">Exclude Ingredient</option>
-        </select>
         <button type="button" onClick={handleSearch}>Search</button>
+        <button type="button" onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}>
+          {showAdvancedSearch ? 'Hide Advanced Search' : 'Show Advanced Search'}
+        </button>
       </SearchForm>
+
+      {showAdvancedSearch && (
+        <AdvancedSearchForm>
+          <FilterGroup>
+            <label>Filter by Country:</label>
+            <input
+              type="text"
+              value={countryFilter}
+              onChange={(e) => setCountryFilter(e.target.value)}
+              placeholder="Filter by Country..."
+            />
+          </FilterGroup>
+          <FilterGroup>
+            <label>Include Ingredient:</label>
+            <input
+              type="text"
+              value={includeIngredient}
+              onChange={(e) => setIncludeIngredient(e.target.value)}
+              placeholder="Include Ingredient..."
+            />
+          </FilterGroup>
+          <FilterGroup>
+            <label>Exclude Ingredient:</label>
+            <input
+              type="text"
+              value={excludeIngredient}
+              onChange={(e) => setExcludeIngredient(e.target.value)}
+              placeholder="Exclude Ingredient..."
+            />
+          </FilterGroup>
+        </AdvancedSearchForm>
+      )}
+
       {loading && <div>Loading...</div>}
       {error && <div>Error: {error.message}</div>}
       <Gallery>
@@ -114,21 +162,45 @@ const SearchForm = styled.div`
     width: 300px;
   }
 
-  select {
-    padding: 10px;
-    margin-right: 10px;
-  }
-
   button {
     padding: 10px 20px;
     background-color: #f0a500;
     color: white;
     border: none;
     cursor: pointer;
+    margin-right: 10px;
   }
 
   button:hover {
     background-color: #d48800;
+  }
+`;
+
+const AdvancedSearchForm = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: 500px; /* Para limitar el ancho total de cada grupo */
+  justify-content: space-between;
+
+  label {
+    margin-right: 10px;
+    flex: 1;
+    text-align: right;
+  }
+
+  input {
+    padding: 10px;
+    width: 70%;
+    flex: 2;
   }
 `;
 

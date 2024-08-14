@@ -123,7 +123,7 @@ const LoginAuth = () => {
         <>
           <UserInfo>
             <img src={user.photoURL} alt="User Avatar" />
-            <p>Welcome, {user.displayName}</p>
+            <p>Welcome, {user.displayName}!</p>
           </UserInfo>
           <FavoritesButton onClick={handleViewFavorites}>My Favorite Recipes</FavoritesButton>
           <Button onClick={handleLogout}>Logout</Button>
@@ -205,20 +205,22 @@ const AuthContainer = styled.div`
 
 const UserInfo = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
   margin-bottom: 15px;
 
   img {
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
   }
 
   p {
     margin: 0;
     font-weight: bold;
     color: white;
+    text-align: center;
   }
 `;
 
