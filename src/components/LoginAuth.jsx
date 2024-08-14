@@ -1,25 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { signInWithGoogle, logOut, auth } from '../firebaseConfig';
 import styled from 'styled-components';
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { FacebookAuthProvider, OAuthProvider } from 'firebase/auth';
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 
 const LoginAuth = () => {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+      if (user && user.emailVerified) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
     });
     return () => unsubscribe();
   }, []);
 
+  const clearFields = (keepEmail = false) => {
+    if (!keepEmail) {
+      setEmail('');
+    }
+    setPassword('');
+    setConfirmPassword('');
+    setName('');
+    setError('');
+  };
+
   const handleEmailLogin = () => {
+    if (!email || !password) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
     signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        if (userCredential.user.emailVerified) {
+          setUser(userCredential.user);
+        } else {
+          setError('Please verify your email before logging in.');
+          auth.signOut(); // Sign out the user if not verified
+        }
+      })
       .catch((error) => {
         setError(error.message);
         console.error("Error during email sign in:", error);
@@ -27,7 +55,46 @@ const LoginAuth = () => {
   };
 
   const handleRegister = () => {
+    if (!name || !email || !password || !confirmPassword) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    const passwordRequirements = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    if (!passwordRequirements.test(password)) {
+      setError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
+      return;
+    }
+
     createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        updateProfile(userCredential.user, {
+          displayName: name,
+          photoURL: 'https://www.pngkit.com/png/full/940-9406687_already-a-proact-user-employee-icon-white-png.png', // Set default profile image
+        }).then(() => {
+          sendEmailVerification(userCredential.user)
+            .then(() => {
+              alert('Verification email sent. Please check your inbox and verify your email.');
+              clearFields(true); // Clear fields but keep the email
+              setIsRegistering(false); // Switch to sign-in mode after registration
+            })
+            .catch((error) => {
+              setError('Failed to send verification email.');
+              console.error("Error during email verification:", error);
+            });
+        });
+      })
       .catch((error) => {
         setError(error.message);
         console.error("Error during registration:", error);
@@ -37,20 +104,6 @@ const LoginAuth = () => {
   const handleGoogleLogin = () => {
     signInWithGoogle().catch((error) => {
       console.error("Error during Google sign in:", error);
-    });
-  };
-
-  const handleFacebookLogin = () => {
-    const provider = new FacebookAuthProvider();
-    signInWithPopup(auth, provider).catch((error) => {
-      console.error("Error during Facebook sign in:", error);
-    });
-  };
-
-  const handleMicrosoftLogin = () => {
-    const provider = new OAuthProvider('microsoft.com');
-    signInWithPopup(auth, provider).catch((error) => {
-      console.error("Error during Microsoft sign in:", error);
     });
   };
 
@@ -72,13 +125,19 @@ const LoginAuth = () => {
             <img src={user.photoURL} alt="User Avatar" />
             <p>Welcome, {user.displayName}</p>
           </UserInfo>
-          <Button onClick={handleLogout}>Logout</Button>
           <FavoritesButton onClick={handleViewFavorites}>My Favorite Recipes</FavoritesButton>
+          <Button onClick={handleLogout}>Logout</Button>
         </>
       ) : (
         <>
           {isRegistering ? (
             <>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name"
+              />
               <Input
                 type="email"
                 value={email}
@@ -91,9 +150,18 @@ const LoginAuth = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
               />
+              <PasswordRequirements>
+                Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.
+              </PasswordRequirements>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm Password"
+              />
               {error && <ErrorText>{error}</ErrorText>}
-              <Button onClick={handleRegister}>Register</Button>
-              <ToggleText onClick={() => setIsRegistering(false)}>Already have an account? Log in</ToggleText>
+              <Button onClick={handleRegister}>Sign Up</Button>
+              <ToggleText onClick={() => { setIsRegistering(false); clearFields(); }}>Already have an account? Sign In</ToggleText>
             </>
           ) : (
             <>
@@ -110,14 +178,12 @@ const LoginAuth = () => {
                 placeholder="Password"
               />
               {error && <ErrorText>{error}</ErrorText>}
-              <Button onClick={handleEmailLogin}>Login</Button>
-              <ToggleText onClick={() => setIsRegistering(true)}>Don't have an account? Register</ToggleText>
+              <Button onClick={handleEmailLogin}>Sign In</Button>
+              <ToggleText onClick={() => { setIsRegistering(true); clearFields(); }}>Don't have an account? Sign Up</ToggleText>
             </>
           )}
-          <Separator>Other Ways to LogIn</Separator>
+          <Separator>Other Ways to Sign In</Separator>
           <Button onClick={handleGoogleLogin}>Sign in with Google</Button>
-          <Button onClick={handleFacebookLogin}>Sign in with Facebook</Button>
-          <Button onClick={handleMicrosoftLogin}>Sign in with Microsoft</Button>
         </>
       )}
     </AuthContainer>
@@ -168,7 +234,7 @@ const Button = styled.button`
   width: 100%;
 
   &:hover {
-    background-color: #357AE8;
+    background-color: #d48800;
   }
 `;
 
@@ -187,6 +253,12 @@ const Input = styled.input`
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 5px;
+`;
+
+const PasswordRequirements = styled.p`
+  color: #ccc;
+  font-size: 0.8rem;
+  margin: -8px 0 10px 0;
 `;
 
 const ToggleText = styled.p`
