@@ -1,7 +1,7 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfig';
 
-export const saveFavoriteRecipe = async (recipeId) => {
+const saveFavoriteRecipe = async (recipeId) => {
   const user = auth.currentUser;
   if (!user) {
     console.error("Usuario no autenticado");
@@ -10,9 +10,9 @@ export const saveFavoriteRecipe = async (recipeId) => {
 
   const userId = user.uid;
   try {
-    await setDoc(doc(db, 'favorites', `${userId}_${recipeId}`), {
-      userId: userId,
+    await setDoc(doc(db, "RecetasFavoritas", `${userId}_${recipeId}`), {
       recipeId: recipeId,
+      userId: userId,
     });
     console.log("Receta guardada como favorita");
   } catch (error) {

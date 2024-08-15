@@ -19,6 +19,7 @@ const Home = () => {
           const data = await response.json();
           const meal = data.meals[0];
           fetchedRecipes.push({
+            id: meal.idMeal,
             image: meal.strMealThumb,
             title: meal.strMeal,
             country: meal.strArea,

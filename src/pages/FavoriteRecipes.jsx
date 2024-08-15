@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { db, auth } from '../firebaseConfig'; // Asegúrate de que estas rutas estén correctas
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import removeFavoriteRecipe from '../components/RemoveFavoriteRecipe';
 
 const FavoriteRecipesContainer = styled.div`
   display: flex;
@@ -42,42 +43,59 @@ const ErrorMessage = styled.p`
   text-align: center;
 `;
 
+const fetchFavorites = async (user, setFavoriteRecipes, setError) => {
+  if (user) {
+    const userId = user.uid;
+    try {
+      const favoritesQuery = query(
+        collection(db, "RecetasFavoritas"),
+        where("userId", "==", userId)
+      );
+
+      const querySnapshot = await getDocs(favoritesQuery);
+
+      const recipesData = await Promise.all(
+        querySnapshot.docs.map(async (doc) => {
+          const recipeId = doc.data().recipeId;
+          try {
+            const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipeId}`);
+            const data = await response.json();
+            return data.meals ? { id: doc.id, ...data.meals[0] } : null;
+          } catch (apiError) {
+            console.error("Error al obtener la receta de la API:", apiError);
+            return null;
+          }
+        })
+      );
+
+      setFavoriteRecipes(recipesData.filter(recipe => recipe !== null));
+    } catch (err) {
+      console.error("Error al obtener las recetas favoritas:", err);
+      setError("Error al obtener las recetas favoritas.");
+    }
+  } else {
+    setError("User not logged in.");
+  }
+};
+
 const FavoriteRecipes = () => {
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
   const [error, setError] = useState(null);
-  const user = auth.currentUser; // Obtener el usuario autenticado
+  const user = auth.currentUser;
 
   useEffect(() => {
-    const fetchFavorites = async () => {
-      if (user) {
-        const userId = user.uid;
-        try {
-          // Consulta en Firestore para obtener los favoritos del usuario
-          const favoritesQuery = query(
-            collection(db, "favorites"),
-            where("userId", "==", userId)
-          );
-
-          const querySnapshot = await getDocs(favoritesQuery);
-          const recipesData = await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const recipeId = doc.data().recipeId;
-            const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipeId}`);
-            const data = await response.json();
-            return data.meals[0];
-          }));
-
-          setFavoriteRecipes(recipesData);
-        } catch (err) {
-          console.error("Error al obtener las recetas favoritas:", err);
-          setError("Failed to load favorite recipes.");
-        }
-      } else {
-        setError("User not logged in.");
-      }
-    };
-
-    fetchFavorites();
+    fetchFavorites(user, setFavoriteRecipes, setError);
   }, [user]);
+
+  const handleRemoveFavorite = async (recipeId) => {
+    try {
+      await removeFavoriteRecipe(recipeId);
+      // Vuelve a consultar las recetas después de eliminar
+      fetchFavorites(user, setFavoriteRecipes, setError);
+    } catch (err) {
+      console.error("Error al eliminar la receta favorita:", err);
+    }
+  };
 
   if (error) {
     return <ErrorMessage>{error}</ErrorMessage>;
@@ -93,12 +111,14 @@ const FavoriteRecipes = () => {
           </>
         )}
       </UserInfo>
-
       <RecipesList>
         {favoriteRecipes.length > 0 ? (
-          favoriteRecipes.map((recipe, index) => (
-            <RecipeItem key={index}>
-              {recipe.strMeal}
+          favoriteRecipes.map((recipe) => (
+            <RecipeItem key={recipe.id}>
+              <p>{recipe.strMeal}</p>
+              <button onClick={() => handleRemoveFavorite(recipe.idMeal)}>
+                Remove from Favorites
+              </button>
             </RecipeItem>
           ))
         ) : (

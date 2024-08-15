@@ -7,17 +7,14 @@ const Modal = ({ show, onClose, recipe }) => {
   if (!show) {
     return null;
   }
-
   const handleAddToFavorites = async () => {
     const user = auth.currentUser; // Verificar si el usuario está autenticado
-
     if (!user) {
       alert("Debes estar logueado para agregar recetas a tus favoritos.");
       return; // Salir de la función si no hay usuario autenticado
     }
-
     try {
-      await saveFavoriteRecipe(recipe.idMeal);
+      await saveFavoriteRecipe(recipe.id);
       alert(`${recipe.title} ha sido agregado a tus favoritos!`);
     } catch (error) {
       console.error("Error al agregar la receta a favoritos:", error);

@@ -24,6 +24,7 @@ const SearchRecipes = () => {
         const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${search}`);
         const data = await response.json();
         const fetchedRecipes = data.meals ? data.meals.map(meal => ({
+          idMeal: meal.idMeal,
           image: meal.strMealThumb,
           title: meal.strMeal,
           country: meal.strArea,

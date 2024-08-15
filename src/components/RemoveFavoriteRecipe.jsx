@@ -6,7 +6,7 @@ const removeFavoriteRecipe = async (recipeId) => {
   if (user) {
     const userId = user.uid;
     try {
-      await deleteDoc(doc(db, 'favorites', `${userId}_${recipeId}`));
+      await deleteDoc(doc(db, 'RecetasFavoritas', `${userId}_${recipeId}`));
       console.log("Receta eliminada de favoritos");
     } catch (error) {
       console.error("Error al eliminar la receta favorita: ", error);
