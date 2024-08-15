@@ -15,7 +15,6 @@ const Modal = ({ show, onClose, recipe }) => {
     }
     try {
       await saveFavoriteRecipe(recipe.id);
-      alert(`${recipe.title} ha sido agregado a tus favoritos!`);
     } catch (error) {
       console.error("Error al agregar la receta a favoritos:", error);
     }

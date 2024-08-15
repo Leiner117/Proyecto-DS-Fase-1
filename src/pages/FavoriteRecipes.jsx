@@ -71,7 +71,6 @@ const fetchFavorites = async (user, setFavoriteRecipes, setError) => {
       setFavoriteRecipes(recipesData.filter(recipe => recipe !== null));
     } catch (err) {
       console.error("Error al obtener las recetas favoritas:", err);
-      setError("Error al obtener las recetas favoritas.");
     }
   } else {
     setError("User not logged in.");
