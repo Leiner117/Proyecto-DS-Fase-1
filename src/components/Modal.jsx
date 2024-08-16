@@ -1,40 +1,48 @@
 import React from 'react';
 import styled from 'styled-components';
-import saveFavoriteRecipe from '../components/SaveFavoriteRecipe '
 import { auth } from '../firebaseConfig';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+import saveFavoriteRecipe from '../components/SaveFavoriteRecipe '
 const Modal = ({ show, onClose, recipe }) => {
   if (!show) {
     return null;
   }
+
   const handleAddToFavorites = async () => {
     const user = auth.currentUser; // Verificar si el usuario está autenticado
     if (!user) {
-      alert("Debes estar logueado para agregar recetas a tus favoritos.");
+      toast.error("Debes estar logueado para agregar recetas a tus favoritos.");
       return; // Salir de la función si no hay usuario autenticado
     }
+
     try {
       await saveFavoriteRecipe(recipe.id);
+     
     } catch (error) {
-      console.error("Error al agregar la receta a favoritos:", error);
+      
     }
   };
 
   return (
-    <ModalOverlay onClick={onClose}>
-      <ModalContent onClick={(e) => e.stopPropagation()}>
-        <ImageSection>
-          <Image src={recipe.image} alt={recipe.title} />
-          <InfoSection>
-            <Title>{recipe.title}</Title>
-            <InfoText>{recipe.instructions}</InfoText>
-          </InfoSection>
-        </ImageSection>
-        <AddToFavoritesButton onClick={handleAddToFavorites}>
-          Add To My Favorites
-        </AddToFavoritesButton>
-      </ModalContent>
-    </ModalOverlay>
+    <>
+      <ModalOverlay onClick={onClose}>
+        <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ImageSection>
+            <Image src={recipe.image} alt={recipe.title} />
+            <InfoSection>
+              <Title>{recipe.title}</Title>
+              <InfoText>{recipe.instructions}</InfoText>
+            </InfoSection>
+          </ImageSection>
+          <AddToFavoritesButton onClick={handleAddToFavorites}>
+            Add To My Favorites
+          </AddToFavoritesButton>
+        </ModalContent>
+      </ModalOverlay>
+      <ToastContainer position="bottom-left" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+    </>
   );
 };
 
@@ -90,7 +98,7 @@ const InfoText = styled.p`
 
 const AddToFavoritesButton = styled.button`
   margin-top: 20px;
-  background-color: #f0a500;
+  background-color: #007bff;
   color: white;
   border: none;
   padding: 10px 15px;

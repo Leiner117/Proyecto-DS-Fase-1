@@ -1,10 +1,12 @@
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfig';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const saveFavoriteRecipe = async (recipeId) => {
   const user = auth.currentUser;
   if (!user) {
-    console.error("Usuario no autenticado");
+    toast.error("Usuario no autenticado");
     return;
   }
 
@@ -17,18 +19,18 @@ const saveFavoriteRecipe = async (recipeId) => {
 
     if (docSnapshot.exists()) {
       // La receta ya está en favoritos
-      alert("Esta receta ya está en tus favoritos.");
+      toast.info("Esta receta ya está en tus favoritos.");
     } else {
       // Guardar la receta como favorita
       await setDoc(doc(db, "RecetasFavoritas", `${userId}_${recipeId}`), {
-      recipeId: recipeId,
-      userId: userId,
-    });
-      alert(`La receta ha sido agregada a tus favoritos!`);
-      console.log("Receta guardada como favorita");
+        recipeId: recipeId,
+        userId: userId,
+      });
+      toast.success("La receta ha sido agregada a tus favoritos!");
+     
     }
   } catch (error) {
-    console.error("Error al guardar la receta favorita: ", error);
+    toast.error("Error al guardar la receta favorita.");
   }
 };
 

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Card from '../components/Card';
 import Modal from '../components/Modal';
 import Spinner from '../components/Spinner';
+import Message from '../components/Message';
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
@@ -56,7 +57,7 @@ const Home = () => {
   };
 
   if (loading) return <Spinner />;
-  if (error) return <div>Error: {error.message}</div>;
+  if (error) return <Message type="error">{error.message}</Message>;
 
   return (
     <HomeContainer>
