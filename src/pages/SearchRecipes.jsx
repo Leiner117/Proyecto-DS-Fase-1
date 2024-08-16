@@ -1,23 +1,120 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
+import { auth, db } from '../firebaseConfig';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import Card from '../components/Card';
-import Modal from '../components/Modal';
 
 const SearchRecipes = () => {
   const [search, setSearch] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
   const [includeIngredient, setIncludeIngredient] = useState('');
   const [excludeIngredient, setExcludeIngredient] = useState('');
-  const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const user = auth.currentUser;
+
+  const fetchFavoriteRecipes = useCallback(async () => {
+    if (user) {
+      try {
+        const favoritesQuery = query(
+          collection(db, "RecetasFavoritas"),
+          where("userId", "==", user.uid)
+        );
+        const querySnapshot = await getDocs(favoritesQuery);
+        const favorites = querySnapshot.docs.map((doc) => doc.data().recipeId);
+        setFavoriteRecipes(favorites);
+      } catch (err) {
+        console.error("Error fetching favorite recipes:", err);
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchFavoriteRecipes();
+    }
+  }, [user, fetchFavoriteRecipes]);
+
+  const resetAdvancedFilters = () => {
+    setCountryFilter('');
+    setIncludeIngredient('');
+    setExcludeIngredient('');
+  };
+
+  const fetchAllRecipes = async () => {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    let allRecipes = [];
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const fetches = alphabet.split('').map(async (letter) => {
+        const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`);
+        const data = await response.json();
+        return data.meals ? data.meals.map(meal => ({
+          id: meal.idMeal,
+          image: meal.strMealThumb,
+          title: meal.strMeal,
+          country: meal.strArea,
+          instructions: meal.strInstructions,
+          ingredients: [
+            meal.strIngredient1,
+            meal.strIngredient2,
+            meal.strIngredient3,
+            meal.strIngredient4,
+            meal.strIngredient5,
+          ].filter(Boolean)
+        })) : [];
+      });
+
+      const results = await Promise.all(fetches);
+      allRecipes = results.flat();
+
+      let filtered = allRecipes;
+      if (countryFilter.trim() !== '') {
+        filtered = filtered.filter(recipe => 
+          recipe.country.toLowerCase().includes(countryFilter.toLowerCase())
+        );
+      }
+      if (includeIngredient.trim() !== '') {
+        filtered = filtered.filter(recipe => 
+          recipe.ingredients.some(ingredient => 
+            ingredient.toLowerCase().includes(includeIngredient.toLowerCase())
+          )
+        );
+      }
+      if (excludeIngredient.trim() !== '') {
+        filtered = filtered.filter(recipe => 
+          !recipe.ingredients.some(ingredient => 
+            ingredient.toLowerCase().includes(excludeIngredient.toLowerCase())
+          )
+        );
+      }
+
+      setFilteredRecipes(filtered);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async () => {
-    if (search.trim() !== '') {
+    if (search.trim() === '') {
+      if (showAdvancedSearch) {
+        if (!countryFilter && !includeIngredient && !excludeIngredient) {
+          setFilteredRecipes([]);
+        } else {
+          fetchAllRecipes();
+        }
+      } else {
+        setFilteredRecipes([]);
+      }
+    } else {
       setLoading(true);
       setError(null);
       try {
@@ -37,7 +134,6 @@ const SearchRecipes = () => {
             meal.strIngredient5,
           ].filter(Boolean)
         })) : [];
-        setRecipes(fetchedRecipes);
         setFilteredRecipes(fetchedRecipes);
         setLoading(false);
       } catch (error) {
@@ -45,43 +141,19 @@ const SearchRecipes = () => {
         setLoading(false);
       }
     }
-
-    // Aplicar filtros avanzados sobre los resultados de búsqueda por nombre
-    let filtered = recipes;
-
-    if (countryFilter.trim() !== '') {
-      filtered = filtered.filter(recipe => 
-        recipe.country.toLowerCase().includes(countryFilter.toLowerCase())
-      );
-    }
-
-    if (includeIngredient.trim() !== '') {
-      filtered = filtered.filter(recipe => 
-        recipe.ingredients.some(ingredient => 
-          ingredient.toLowerCase().includes(includeIngredient.toLowerCase())
-        )
-      );
-    }
-
-    if (excludeIngredient.trim() !== '') {
-      filtered = filtered.filter(recipe => 
-        !recipe.ingredients.some(ingredient => 
-          ingredient.toLowerCase().includes(excludeIngredient.toLowerCase())
-        )
-      );
-    }
-
-    setFilteredRecipes(filtered);
   };
 
-  const handleCardClick = (recipe) => {
-    setSelectedRecipe(recipe);
-    setShowModal(true);
+  const handleToggleAdvancedSearch = () => {
+    setShowAdvancedSearch(!showAdvancedSearch);
+    if (showAdvancedSearch) {
+      resetAdvancedFilters();
+    }
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedRecipe(null);
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -91,12 +163,14 @@ const SearchRecipes = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Search Recipes by Name..."
         />
         <button type="button" onClick={handleSearch}>Search</button>
-        <button type="button" onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}>
+        <button type="button" onClick={handleToggleAdvancedSearch}>
           {showAdvancedSearch ? 'Hide Advanced Search' : 'Show Advanced Search'}
         </button>
+        <button type="button" onClick={fetchAllRecipes}>View All</button>
       </SearchForm>
 
       {showAdvancedSearch && (
@@ -134,17 +208,17 @@ const SearchRecipes = () => {
       {loading && <div>Loading...</div>}
       {error && <div>Error: {error.message}</div>}
       <Gallery>
-        {filteredRecipes.map((recipe, index) => (
+        {filteredRecipes.map((recipe) => (
           <Card
-            key={index}
+            key={recipe.id}
+            id={recipe.id}
             image={recipe.image}
             title={recipe.title}
             country={recipe.country}
-            onClick={() => handleCardClick(recipe)}
+            isFavorite={favoriteRecipes.includes(recipe.id)}
           />
         ))}
       </Gallery>
-      <Modal show={showModal} onClose={handleCloseModal} recipe={selectedRecipe} />
     </div>
   );
 };
@@ -156,7 +230,7 @@ const SearchForm = styled.div`
   justify-content: center;
   align-items: center;
   margin-bottom: 20px;
-
+  padding: 20px;
   input {
     padding: 10px;
     margin-right: 10px;
@@ -189,7 +263,7 @@ const FilterGroup = styled.div`
   align-items: center;
   margin-bottom: 10px;
   width: 100%;
-  max-width: 500px; /* Para limitar el ancho total de cada grupo */
+  max-width: 500px;
   justify-content: space-between;
 
   label {
