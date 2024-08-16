@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { auth, db } from '../firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Card from '../components/Card';
+import Spinner from '../components/Spinner';
 
 const SearchRecipes = () => {
   const [search, setSearch] = useState('');
@@ -157,7 +158,7 @@ const SearchRecipes = () => {
   };
 
   return (
-    <div>
+    <Container>
       <SearchForm>
         <input
           type="text"
@@ -205,8 +206,8 @@ const SearchRecipes = () => {
         </AdvancedSearchForm>
       )}
 
-      {loading && <div>Loading...</div>}
-      {error && <div>Error: {error.message}</div>}
+      {loading && <Spinner />}
+      {error && <ErrorMessage>Error: {error.message}</ErrorMessage>}
       <Gallery>
         {filteredRecipes.map((recipe) => (
           <Card
@@ -219,11 +220,15 @@ const SearchRecipes = () => {
           />
         ))}
       </Gallery>
-    </div>
+    </Container>
   );
 };
 
 export default SearchRecipes;
+
+const Container = styled.div`
+  padding: 20px;
+`;
 
 const SearchForm = styled.div`
   display: flex;
@@ -231,10 +236,23 @@ const SearchForm = styled.div`
   align-items: center;
   margin-bottom: 20px;
   padding: 20px;
+  flex-wrap: wrap;
+  
   input {
     padding: 10px;
     margin-right: 10px;
     width: 300px;
+
+    @media (max-width: 768px) {
+      margin-right: 5px;
+      width: 250px;
+    }
+
+    @media (max-width: 480px) {
+      margin-right: 0;
+      width: 200px;
+      margin-bottom: 10px;
+    }
   }
 
   button {
@@ -244,10 +262,23 @@ const SearchForm = styled.div`
     border: none;
     cursor: pointer;
     margin-right: 10px;
-  }
+    margin-bottom: 10px;
 
-  button:hover {
-    background-color: #d48800;
+    &:hover {
+      background-color: #d48800;
+    }
+
+    @media (max-width: 768px) {
+      margin-right: 5px;
+      padding: 8px 16px;
+    }
+
+    @media (max-width: 480px) {
+      margin-right: 0;
+      width: 100%;
+      text-align: center;
+      padding: 8px 16px;
+    }
   }
 `;
 
@@ -256,6 +287,11 @@ const AdvancedSearchForm = styled.div`
   flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    align-items: stretch;
+  }
 `;
 
 const FilterGroup = styled.div`
@@ -270,12 +306,21 @@ const FilterGroup = styled.div`
     margin-right: 10px;
     flex: 1;
     text-align: right;
+
+    @media (max-width: 480px) {
+      text-align: left;
+      margin-right: 5px;
+    }
   }
 
   input {
     padding: 10px;
     width: 70%;
     flex: 2;
+
+    @media (max-width: 480px) {
+      width: 65%;
+    }
   }
 `;
 
@@ -284,4 +329,11 @@ const Gallery = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   padding: 20px;
+`;
+
+const ErrorMessage = styled.div`
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
 `;

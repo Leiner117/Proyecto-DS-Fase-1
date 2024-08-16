@@ -3,9 +3,11 @@ import styled from 'styled-components';
 import { auth, db } from '../firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Card from '../components/Card';
+import Spinner from '../components/Spinner'; 
 
 const FavoriteRecipes = () => {
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
   const user = auth.currentUser;
 
@@ -13,6 +15,7 @@ const FavoriteRecipes = () => {
     const fetchFavorites = async () => {
       if (!user) {
         setError("User not logged in.");
+        setLoading(false); 
         return;
       }
 
@@ -51,11 +54,17 @@ const FavoriteRecipes = () => {
       } catch (err) {
         console.error("Error al obtener las recetas favoritas:", err);
         setError("Error fetching favorite recipes.");
+      } finally {
+        setLoading(false); 
       }
     };
 
     fetchFavorites();
   }, [user]);
+
+  if (loading) {
+    return <Spinner />; 
+  }
 
   if (error) {
     return <ErrorMessage>{error}</ErrorMessage>;

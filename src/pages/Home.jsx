@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../components/Card';
+import Spinner from '../components/Spinner';
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
@@ -18,7 +19,7 @@ const Home = () => {
         const fetchedRecipes = results.map(data => {
           const meal = data.meals[0];
           return {
-            id: meal.idMeal,
+            id: meal.idMeal, // Asegúrate de que el ID se pasa correctamente
             image: meal.strMealThumb,
             title: meal.strMeal,
             country: meal.strArea,
@@ -44,7 +45,7 @@ const Home = () => {
     fetchRecipes();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Spinner />;
   if (error) return <div>Error: {error.message}</div>;
 
   return (
@@ -53,7 +54,8 @@ const Home = () => {
       <CardSection>
         {recipes.map((recipe, index) => (
           <Card
-            key={index}
+            key={recipe.id} // Usa el ID único
+            id={recipe.id}  // Pasa el ID al componente Card
             image={recipe.image}
             title={recipe.title}
             country={recipe.country}

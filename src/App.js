@@ -1,10 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { createGlobalStyle } from 'styled-components';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import ExploreMap from './pages/ExploreMap';
 import SearchRecipes from './pages/SearchRecipes';
-import { createGlobalStyle } from 'styled-components';
 import FavoriteRecipes from './pages/FavoriteRecipes';
 import { UserProvider } from './context/UserContext';
 import PrivateRoute from './context/PrivateRoute';
@@ -115,6 +117,16 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          <ToastContainer 
+            position="bottom-left" // Posición de las notificaciones
+            autoClose={5000} // Tiempo de cierre automático en milisegundos
+            hideProgressBar={false} // Mostrar la barra de progreso
+            newestOnTop={false} // Mostrar la notificación más reciente en la parte superior
+            closeOnClick // Cerrar la notificación al hacer clic
+            rtl={false} // Direccionalidad de izquierda a derecha
+            pauseOnFocusLoss // Pausar el temporizador de cierre automático cuando la ventana pierde el foco
+            pauseOnHover // Pausar el temporizador de cierre automático cuando se pasa el mouse sobre la notificación
+          />
         </UserProvider>
       </Router>
     </>

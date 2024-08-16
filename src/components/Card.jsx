@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { auth, db } from '../firebaseConfig';
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Card = ({ id, image, title, origin }) => {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -21,6 +23,7 @@ const Card = ({ id, image, title, origin }) => {
   const toggleFavorite = async (e) => {
     e.stopPropagation();
     if (!user) {
+      toast.info("Must Sign in to use this feature!");
       return;
     }
 
@@ -29,14 +32,14 @@ const Card = ({ id, image, title, origin }) => {
       if (isFavorite) {
         await deleteDoc(favoriteDocRef);
         setIsFavorite(false);
-        console.log("Receta eliminada de favoritos");
+        toast.warn("Recipe deleted as favorite!");
       } else {
         await setDoc(favoriteDocRef, { recipeId: id, userId: user.uid });
         setIsFavorite(true);
-        console.log("Receta guardada como favorita");
+        toast.success("Recipe added as favorite!");
       }
     } catch (error) {
-      console.error("Error al manejar favoritos: ", error);
+      toast.error("Error adding favorite recipe!");
     }
   };
 
