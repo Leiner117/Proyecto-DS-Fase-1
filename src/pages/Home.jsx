@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../components/Card';
 import Modal from '../components/Modal';
+import Spinner from '../components/Spinner';
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
@@ -54,7 +55,7 @@ const Home = () => {
     setSelectedRecipe(null);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Spinner />;
   if (error) return <div>Error: {error.message}</div>;
 
   return (
