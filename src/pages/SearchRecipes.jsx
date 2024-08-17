@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
+import { toast } from 'react-toastify';  // Importamos toast para mostrar las notificaciones
 import { auth, db } from '../firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Card from '../components/Card';
@@ -7,16 +8,21 @@ import Spinner from '../components/Spinner';
 
 const SearchRecipes = () => {
   const [search, setSearch] = useState('');
-  const [countryFilter, setCountryFilter] = useState('');
+  const [areaFilter, setAreaFilter] = useState('');
   const [includeIngredient, setIncludeIngredient] = useState('');
   const [excludeIngredient, setExcludeIngredient] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const [areas, setAreas] = useState([]);
+  const [ingredients, setIngredients] = useState([]);
+  const [categories, setCategories] = useState([]);
   const user = auth.currentUser;
 
+  // Fetch favorite recipes from Firebase
   const fetchFavoriteRecipes = useCallback(async () => {
     if (user) {
       try {
@@ -39,19 +45,85 @@ const SearchRecipes = () => {
     }
   }, [user, fetchFavoriteRecipes]);
 
+  // Fetch data for areas, ingredients, and categories
+  useEffect(() => {
+    const fetchFiltersData = async () => {
+      try {
+        const areaResponse = await fetch('https://www.themealdb.com/api/json/v1/1/list.php?a=list');
+        const areaData = await areaResponse.json();
+        setAreas(areaData.meals.map(meal => meal.strArea));
+
+        const ingredientResponse = await fetch('https://www.themealdb.com/api/json/v1/1/list.php?i=list');
+        const ingredientData = await ingredientResponse.json();
+        // Sort ingredients alphabetically
+        const sortedIngredients = ingredientData.meals
+          .map(meal => meal.strIngredient)
+          .sort((a, b) => a.localeCompare(b));
+        setIngredients(sortedIngredients);
+
+        const categoryResponse = await fetch('https://www.themealdb.com/api/json/v1/1/list.php?c=list');
+        const categoryData = await categoryResponse.json();
+        setCategories(categoryData.meals.map(meal => meal.strCategory));
+      } catch (error) {
+        console.error("Error fetching filter data:", error);
+        setError(error);
+      }
+    };
+
+    fetchFiltersData();
+  }, []);
+
   const resetAdvancedFilters = () => {
-    setCountryFilter('');
+    setAreaFilter('');
     setIncludeIngredient('');
     setExcludeIngredient('');
+    setCategoryFilter('');
+  };
+
+  const applyFilters = (recipes) => {
+    let filtered = recipes;
+
+    if (areaFilter.trim() !== '') {
+      filtered = filtered.filter(recipe => 
+        recipe.origin.toLowerCase().includes(areaFilter.toLowerCase())
+      );
+    }
+
+    if (includeIngredient.trim() !== '') {
+      filtered = filtered.filter(recipe => 
+        recipe.ingredients.some(ingredient => 
+          ingredient.toLowerCase().includes(includeIngredient.toLowerCase())
+        )
+      );
+    }
+
+    if (excludeIngredient.trim() !== '') {
+      filtered = filtered.filter(recipe => 
+        !recipe.ingredients.some(ingredient => 
+          ingredient.toLowerCase().includes(excludeIngredient.toLowerCase())
+        )
+      );
+    }
+
+    if (categoryFilter.trim() !== '') {
+      filtered = filtered.filter(recipe => 
+        recipe.category && recipe.category.toLowerCase().includes(categoryFilter.toLowerCase())
+      );
+    }
+
+    return filtered;
   };
 
   const fetchAllRecipes = async () => {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz';
     let allRecipes = [];
-
+  
     setLoading(true);
     setError(null);
-
+    setShowAdvancedSearch(false); 
+    setSearch('');
+    resetAdvancedFilters();
+  
     try {
       const fetches = alphabet.split('').map(async (letter) => {
         const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`);
@@ -60,7 +132,8 @@ const SearchRecipes = () => {
           id: meal.idMeal,
           image: meal.strMealThumb,
           title: meal.strMeal,
-          country: meal.strArea,
+          origin: meal.strArea,
+          category: meal.strCategory,
           instructions: meal.strInstructions,
           ingredients: [
             meal.strIngredient1,
@@ -71,32 +144,18 @@ const SearchRecipes = () => {
           ].filter(Boolean)
         })) : [];
       });
-
+  
       const results = await Promise.all(fetches);
       allRecipes = results.flat();
-
-      let filtered = allRecipes;
-      if (countryFilter.trim() !== '') {
-        filtered = filtered.filter(recipe => 
-          recipe.country.toLowerCase().includes(countryFilter.toLowerCase())
-        );
+  
+      // No aplicamos filtros aquí porque queremos ver todas las recetas
+      if (allRecipes.length === 0) {
+        setFilteredRecipes([]);
+        toast.info("This search returned no results.");
+      } else {
+        setFilteredRecipes(allRecipes);
       }
-      if (includeIngredient.trim() !== '') {
-        filtered = filtered.filter(recipe => 
-          recipe.ingredients.some(ingredient => 
-            ingredient.toLowerCase().includes(includeIngredient.toLowerCase())
-          )
-        );
-      }
-      if (excludeIngredient.trim() !== '') {
-        filtered = filtered.filter(recipe => 
-          !recipe.ingredients.some(ingredient => 
-            ingredient.toLowerCase().includes(excludeIngredient.toLowerCase())
-          )
-        );
-      }
-
-      setFilteredRecipes(filtered);
+  
       setLoading(false);
     } catch (error) {
       setError(error);
@@ -106,12 +165,8 @@ const SearchRecipes = () => {
 
   const handleSearch = async () => {
     if (search.trim() === '') {
-      if (showAdvancedSearch) {
-        if (!countryFilter && !includeIngredient && !excludeIngredient) {
-          setFilteredRecipes([]);
-        } else {
-          fetchAllRecipes();
-        }
+      if (showAdvancedSearch && (areaFilter || includeIngredient || excludeIngredient || categoryFilter)) {
+        fetchAllRecipes();
       } else {
         setFilteredRecipes([]);
       }
@@ -125,7 +180,8 @@ const SearchRecipes = () => {
           id: meal.idMeal,
           image: meal.strMealThumb,
           title: meal.strMeal,
-          country: meal.strArea,
+          origin: meal.strArea,
+          category: meal.strCategory,
           instructions: meal.strInstructions,
           ingredients: [
             meal.strIngredient1,
@@ -135,7 +191,15 @@ const SearchRecipes = () => {
             meal.strIngredient5,
           ].filter(Boolean)
         })) : [];
-        setFilteredRecipes(fetchedRecipes);
+        const filtered = applyFilters(fetchedRecipes);
+
+        if (filtered.length === 0) {
+          setFilteredRecipes([]);
+          toast.info("This search returned no results.");
+        } else {
+          setFilteredRecipes(filtered);
+        }
+
         setLoading(false);
       } catch (error) {
         setError(error);
@@ -177,31 +241,52 @@ const SearchRecipes = () => {
       {showAdvancedSearch && (
         <AdvancedSearchForm>
           <FilterGroup>
-            <label>Filter by Country:</label>
-            <input
-              type="text"
-              value={countryFilter}
-              onChange={(e) => setCountryFilter(e.target.value)}
-              placeholder="Filter by Country..."
-            />
+            <label>Filter by Area:</label>
+            <select
+              value={areaFilter}
+              onChange={(e) => setAreaFilter(e.target.value)}
+            >
+              <option value="">Select an Area</option>
+              {areas.map((area, index) => (
+                <option key={index} value={area}>{area}</option>
+              ))}
+            </select>
           </FilterGroup>
           <FilterGroup>
             <label>Include Ingredient:</label>
-            <input
-              type="text"
+            <select
               value={includeIngredient}
               onChange={(e) => setIncludeIngredient(e.target.value)}
-              placeholder="Include Ingredient..."
-            />
+            >
+              <option value="">Select an Ingredient</option>
+              {ingredients.map((ingredient, index) => (
+                <option key={index} value={ingredient}>{ingredient}</option>
+              ))}
+            </select>
           </FilterGroup>
           <FilterGroup>
             <label>Exclude Ingredient:</label>
-            <input
-              type="text"
+            <select
               value={excludeIngredient}
               onChange={(e) => setExcludeIngredient(e.target.value)}
-              placeholder="Exclude Ingredient..."
-            />
+            >
+              <option value="">Select an Ingredient</option>
+              {ingredients.map((ingredient, index) => (
+                <option key={index} value={ingredient}>{ingredient}</option>
+              ))}
+            </select>
+          </FilterGroup>
+          <FilterGroup>
+            <label>Filter by Category:</label>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="">Select a Category</option>
+              {categories.map((category, index) => (
+                <option key={index} value={category}>{category}</option>
+              ))}
+            </select>
           </FilterGroup>
         </AdvancedSearchForm>
       )}
@@ -215,7 +300,7 @@ const SearchRecipes = () => {
             id={recipe.id}
             image={recipe.image}
             title={recipe.title}
-            country={recipe.country}
+            origin={recipe.origin}
             isFavorite={favoriteRecipes.includes(recipe.id)}
           />
         ))}
@@ -237,11 +322,12 @@ const SearchForm = styled.div`
   margin-bottom: 20px;
   padding: 20px;
   flex-wrap: wrap;
-  
+
   input {
     padding: 10px;
     margin-right: 10px;
     width: 300px;
+    margin-top: -8px;
 
     @media (max-width: 768px) {
       margin-right: 5px;
@@ -252,6 +338,7 @@ const SearchForm = styled.div`
       margin-right: 0;
       width: 200px;
       margin-bottom: 10px;
+      margin-top: 0; /* Resetea el margen superior en pantallas pequeñas */
     }
   }
 
@@ -313,7 +400,7 @@ const FilterGroup = styled.div`
     }
   }
 
-  input {
+  select {
     padding: 10px;
     width: 70%;
     flex: 2;
