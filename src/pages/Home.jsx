@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../components/Card';
-import Modal from '../components/Modal';
 import Spinner from '../components/Spinner';
-import Message from '../components/Message';
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const fetchedRecipes = [];
-        for (let i = 0; i < 4; i++) {
-          const response = await fetch('https://www.themealdb.com/api/json/v1/1/random.php');
-          const data = await response.json();
+        const fetchPromises = Array.from({ length: 4 }, () =>
+          fetch('https://www.themealdb.com/api/json/v1/1/random.php').then(response => response.json())
+        );
+
+        const results = await Promise.all(fetchPromises);
+        const fetchedRecipes = results.map(data => {
           const meal = data.meals[0];
-          fetchedRecipes.push({
-            id: meal.idMeal,
+          return {
+            id: meal.idMeal, // Asegúrate de que el ID se pasa correctamente
             image: meal.strMealThumb,
             title: meal.strMeal,
             country: meal.strArea,
@@ -32,9 +30,10 @@ const Home = () => {
               meal.strIngredient3,
               meal.strIngredient4,
               meal.strIngredient5,
-            ] : []
-          });
-        }
+            ] : [],
+          };
+        });
+
         setRecipes(fetchedRecipes);
         setLoading(false);
       } catch (error) {
@@ -46,47 +45,34 @@ const Home = () => {
     fetchRecipes();
   }, []);
 
-  const handleCardClick = (recipe) => {
-    setSelectedRecipe(recipe);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedRecipe(null);
-  };
-
   if (loading) return <Spinner />;
-  if (error) return <Message type="error">{error.message}</Message>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <HomeContainer>
-      <Title>Recomended Recipes</Title>
+      <Title>Recommended Recipes</Title>
       <CardSection>
         {recipes.map((recipe, index) => (
           <Card
-            key={index}
+            key={recipe.id} // Usa el ID único
+            id={recipe.id}  // Pasa el ID al componente Card
             image={recipe.image}
             title={recipe.title}
             country={recipe.country}
-            onClick={() => handleCardClick(recipe)}
           />
         ))}
       </CardSection>
 
       <ObjectiveTitle>About Us</ObjectiveTitle>
       <Paragraph>
-      The idea of our site is to provide easy, quick and healthy recipes for college students. We know that college life can be hectic and often finding time to prepare a proper meal is a challenge. That's why we've put together a variety of recipes to fit busy schedules and limited budgets.
+        The idea of our site is to provide easy, quick, and healthy recipes for college students. We know that college life can be hectic, and often finding time to prepare a proper meal is a challenge. That's why we've put together a variety of recipes to fit busy schedules and limited budgets.
       </Paragraph>
       <Paragraph>
-      Our goal is to help students maintain a balanced diet by providing meal ideas that are not only nutritious, but also easy to prepare. With our recipes, we hope to inspire students to experiment in the kitchen and discover that eating well doesn't have to be complicated or expensive.
+        Our goal is to help students maintain a balanced diet by providing meal ideas that are not only nutritious but also easy to prepare. With our recipes, we hope to inspire students to experiment in the kitchen and discover that eating well doesn't have to be complicated or expensive.
       </Paragraph>
       <Paragraph>
-      Plus, many of our recipes are designed to be adaptable, which means they can be adjusted based on ingredients you have on hand or dietary preferences you may have. We love helping students eat well and feel good, no matter what their skill level in the kitchen!
+        Plus, many of our recipes are designed to be adaptable, which means they can be adjusted based on ingredients you have on hand or dietary preferences you may have. We love helping students eat well and feel good, no matter what their skill level in the kitchen!
       </Paragraph>
-      
-      {/* Modal para mostrar los detalles de la receta seleccionada */}
-      <Modal show={showModal} onClose={handleCloseModal} recipe={selectedRecipe} />
     </HomeContainer>
   );
 };
