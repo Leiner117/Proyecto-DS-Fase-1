@@ -43,9 +43,10 @@ const ViewRecipe = () => {
         <Image src={recipe.strMealThumb} alt={recipe.strMeal} />
       </ImageSection>
       <InfoSection>
+      <TitleArea>
         <Title>{recipe.strMeal}</Title>
-        <Category>{recipe.strCategory}</Category>
         <Area>{recipe.strArea}</Area>
+      </TitleArea>
         <Ingredients>
           <h3>Ingredients:</h3>
           <ul>
@@ -101,11 +102,18 @@ const Image = styled.img`
 const InfoSection = styled.div`
   text-align: center;
 `;
+const TitleArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+`;
 
 const Title = styled.h2`
   font-size: 2.5rem;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   color: #333;
+  text-align: center;
   @media (max-width: 768px) {
     font-size: 2rem;
   }
@@ -117,11 +125,12 @@ const Category = styled.p`
   color: #666;
 `;
 
+
 const Area = styled.p`
   font-size: 1.2rem;
   font-weight: bold;
   color: #666;
-  margin-bottom: 20px;
+  text-align: center;
 `;
 
 const Instructions = styled.p`
