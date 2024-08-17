@@ -114,15 +114,15 @@ const SearchRecipes = () => {
     return filtered;
   };
 
-  const fetchAllRecipes = async () => {
+  const viewAllRecipes = async () => {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz';
     let allRecipes = [];
   
     setLoading(true);
     setError(null);
-    setShowAdvancedSearch(false); 
-    setSearch('');
-    resetAdvancedFilters();
+    setShowAdvancedSearch(false);  // Ocultar la búsqueda avanzada
+    setSearch('');  // Reiniciar el input de nombre
+    resetAdvancedFilters();  // Reiniciar los filtros avanzados
   
     try {
       const fetches = alphabet.split('').map(async (letter) => {
@@ -148,7 +148,6 @@ const SearchRecipes = () => {
       const results = await Promise.all(fetches);
       allRecipes = results.flat();
   
-      // No aplicamos filtros aquí porque queremos ver todas las recetas
       if (allRecipes.length === 0) {
         setFilteredRecipes([]);
         toast.info("This search returned no results.");
@@ -162,11 +161,61 @@ const SearchRecipes = () => {
       setLoading(false);
     }
   };
+  
+
+  const fetchAllRecipes = async () => {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    let allRecipes = [];
+  
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const fetches = alphabet.split('').map(async (letter) => {
+        const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`);
+        const data = await response.json();
+        return data.meals ? data.meals.map(meal => ({
+          id: meal.idMeal,
+          image: meal.strMealThumb,
+          title: meal.strMeal,
+          origin: meal.strArea,
+          category: meal.strCategory,
+          instructions: meal.strInstructions,
+          ingredients: [
+            meal.strIngredient1,
+            meal.strIngredient2,
+            meal.strIngredient3,
+            meal.strIngredient4,
+            meal.strIngredient5,
+          ].filter(Boolean)
+        })) : [];
+      });
+  
+      const results = await Promise.all(fetches);
+      allRecipes = results.flat();
+  
+      const filtered = applyFilters(allRecipes);  // Aplicar los filtros seleccionados
+  
+      if (filtered.length === 0) {
+        setFilteredRecipes([]);
+        toast.info("This search returned no results.");
+      } else {
+        setFilteredRecipes(filtered);
+      }
+  
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+  
 
   const handleSearch = async () => {
     if (search.trim() === '') {
-      if (showAdvancedSearch && (areaFilter || includeIngredient || excludeIngredient || categoryFilter)) {
-        fetchAllRecipes();
+      // Si no hay input de nombre, pero hay filtros avanzados o está visible la búsqueda avanzada, aplicamos filtros
+      if (showAdvancedSearch || areaFilter || includeIngredient || excludeIngredient || categoryFilter) {
+        fetchAllRecipes();  // Aquí se aplican los filtros
       } else {
         setFilteredRecipes([]);
       }
@@ -192,21 +241,21 @@ const SearchRecipes = () => {
           ].filter(Boolean)
         })) : [];
         const filtered = applyFilters(fetchedRecipes);
-
+  
         if (filtered.length === 0) {
           setFilteredRecipes([]);
           toast.info("This search returned no results.");
         } else {
           setFilteredRecipes(filtered);
         }
-
+  
         setLoading(false);
       } catch (error) {
         setError(error);
         setLoading(false);
       }
     }
-  };
+  };  
 
   const handleToggleAdvancedSearch = () => {
     setShowAdvancedSearch(!showAdvancedSearch);
@@ -235,7 +284,7 @@ const SearchRecipes = () => {
         <button type="button" onClick={handleToggleAdvancedSearch}>
           {showAdvancedSearch ? 'Hide Advanced Search' : 'Show Advanced Search'}
         </button>
-        <button type="button" onClick={fetchAllRecipes}>View All</button>
+        <button type="button" onClick={viewAllRecipes}>View All</button>
       </SearchForm>
 
       {showAdvancedSearch && (
