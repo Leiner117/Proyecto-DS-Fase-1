@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebaseConfig';
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
@@ -8,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const Card = ({ id, image, title, origin }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const user = auth.currentUser;
-
+  const navigate = useNavigate();
   useEffect(() => {
     const checkIfFavorite = async () => {
       if (user) {
@@ -42,9 +43,11 @@ const Card = ({ id, image, title, origin }) => {
       toast.error("Error adding favorite recipe!");
     }
   };
-
+  const handleCardClick = () => {
+    navigate(`/recipe/${id}`);
+  };
   return (
-    <CardContainer>
+    <CardContainer onClick={handleCardClick}>
       <ImageContainer>
         <Image src={image} alt={title} />
         <FavoriteButton isFavorite={isFavorite} onClick={toggleFavorite} />

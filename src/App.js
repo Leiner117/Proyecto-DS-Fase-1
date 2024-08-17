@@ -11,7 +11,7 @@ import FavoriteRecipes from './pages/FavoriteRecipes';
 import { UserProvider } from './context/UserContext';
 import PrivateRoute from './context/PrivateRoute';
 import Footer from './components/Footer';
-
+import ViewRecipe from './pages/ViewRecipe';
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap'); 
 
@@ -114,6 +114,7 @@ function App() {
               <Route path="/exploremap" element={<ExploreMap />} />
               <Route path="/searchrecipes" element={<SearchRecipes />} />
               <Route path="/favoriterecipes" element={<PrivateRoute component={FavoriteRecipes} />} />
+              <Route path="/recipe/:id" element={<PrivateRoute component={ViewRecipe} />} />
             </Routes>
           </main>
           <Footer />
