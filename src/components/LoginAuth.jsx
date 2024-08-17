@@ -115,7 +115,7 @@ const LoginAuth = () => {
   };
   const navigate = useNavigate();
   const handleViewFavorites = () => {
-    navigate('/RecetasFavoritas');
+    navigate('/favoriterecipes');
   };
 
   return (
