@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
-import Spinner from '../components/Spinner';
+
 const ViewRecipe = () => {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
@@ -15,6 +15,7 @@ const ViewRecipe = () => {
         setRecipe(data.meals[0]);
         setLoading(false);
       } catch (error) {
+        console.error("Error fetching recipe:", error);
         setLoading(false);
       }
     };
@@ -22,7 +23,9 @@ const ViewRecipe = () => {
     fetchRecipe();
   }, [id]);
 
-  if (loading) return <Spinner />;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!recipe) {
     return <div>Recipe not found</div>;
@@ -43,17 +46,31 @@ const ViewRecipe = () => {
         <Image src={recipe.strMealThumb} alt={recipe.strMeal} />
       </ImageSection>
       <InfoSection>
-      <TitleArea>
-        <Title>{recipe.strMeal}</Title>
-        <Area>{recipe.strArea}</Area>
-      </TitleArea>
+        <TitleArea>
+          <Title>{recipe.strMeal}</Title>
+          <Area>{recipe.strArea}</Area>
+        </TitleArea>
         <Ingredients>
           <h3>Ingredients:</h3>
-          <ul>
-            {ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
-          </ul>
+          <Table>
+            <thead>
+              <tr>
+                <th>Ingredient</th>
+                <th>Measure</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ingredients.map((ingredient, index) => {
+                const [ingredientName, measure] = ingredient.split(' - ');
+                return (
+                  <tr key={index}>
+                    <td>{ingredientName}</td>
+                    <td>{measure}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
         </Ingredients>
         <Instructions>{recipe.strInstructions}</Instructions>
         {recipe.strYoutube && (
@@ -102,6 +119,7 @@ const Image = styled.img`
 const InfoSection = styled.div`
   text-align: center;
 `;
+
 const TitleArea = styled.div`
   display: flex;
   flex-direction: column;
@@ -119,13 +137,6 @@ const Title = styled.h2`
   }
 `;
 
-const Category = styled.p`
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #666;
-`;
-
-
 const Area = styled.p`
   font-size: 1.2rem;
   font-weight: bold;
@@ -134,45 +145,55 @@ const Area = styled.p`
 `;
 
 const Instructions = styled.p`
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: 18px;
+  line-height: 1.6;
   text-align: left;
-  color: #444;
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
+  margin-top: 20px; /* Espacio entre ingredientes e instrucciones */
 `;
 
 const Ingredients = styled.div`
   text-align: left;
   margin-top: 20px;
+`;
 
-  h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  margin-bottom: 20px; /* Espacio entre ingredientes e instrucciones */
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 12px; /* Aumenta el padding para más espacio */
+    text-align: left;
   }
 
-  ul {
-    list-style-type: none;
-    padding: 0;
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    font-size: 1.1rem; /* Aumenta el tamaño de la fuente */
   }
 
-  li {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: #555;
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  tr:hover {
+    background-color: #f1f1f1;
   }
 `;
 
 const Video = styled.div`
-  margin-top: 30px;
-  iframe {
+  margin-top: 20px;
 
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  iframe {
+    width: 100%;
+    height: 315px;
   }
-  h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+
+  a {
+    font-size: 18px;
+    color: blue;
+    text-decoration: underline;
   }
 `;
