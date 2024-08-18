@@ -219,8 +219,8 @@ const UserInfo = styled.div`
 
   img {
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     margin-bottom: 10px;
   }
 
