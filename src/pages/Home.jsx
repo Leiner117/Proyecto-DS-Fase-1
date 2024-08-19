@@ -9,6 +9,7 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchRecipes = async () => {
       try {
         const fetchPromises = Array.from({ length: 4 }, () =>

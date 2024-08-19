@@ -12,6 +12,7 @@ const FavoriteRecipes = () => {
   const user = auth.currentUser;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchFavorites = async () => {
       if (!user) {
         setError("User not logged in.");

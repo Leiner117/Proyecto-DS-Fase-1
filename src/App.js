@@ -12,6 +12,7 @@ import { UserProvider } from './context/UserContext';
 import PrivateRoute from './context/PrivateRoute';
 import Footer from './components/Footer';
 import ViewRecipe from './pages/ViewRecipe';
+
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap'); 
 
@@ -99,6 +100,28 @@ const GlobalStyle = createGlobalStyle`
       font-size: 0.9rem;
     }
   }
+
+  /* Estilos personalizados para los toasts */
+  .toast-container {
+    width: 350px;
+    max-width: 90%; /* Asegura que el toast no sobrepase el ancho de la pantalla */
+    margin: 0 auto;
+  }
+
+  /* Estilos para dispositivos móviles */
+  @media (max-width: 768px) {
+    .toast-container {
+      width: 300px;
+      padding: 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .toast-container {
+      width: 250px;
+      padding: 8px;
+    }
+  }
 `;
 
 function App() {
@@ -114,19 +137,21 @@ function App() {
               <Route path="/exploremap" element={<ExploreMap />} />
               <Route path="/searchrecipes" element={<SearchRecipes />} />
               <Route path="/favoriterecipes" element={<PrivateRoute component={FavoriteRecipes} />} />
-              <Route path="/recipe/:id" element={<PrivateRoute component={ViewRecipe} />} />
+              <Route path="/recipe/:id" element={<ViewRecipe />} /> 
             </Routes>
           </main>
           <Footer />
-          <ToastContainer 
-            position="bottom-left" // Posición de las notificaciones
-            autoClose={5000} // Tiempo de cierre automático en milisegundos
-            hideProgressBar={false} // Mostrar la barra de progreso
-            newestOnTop={false} // Mostrar la notificación más reciente en la parte superior
-            closeOnClick // Cerrar la notificación al hacer clic
-            rtl={false} // Direccionalidad de izquierda a derecha
-            pauseOnFocusLoss // Pausar el temporizador de cierre automático cuando la ventana pierde el foco
-            pauseOnHover // Pausar el temporizador de cierre automático cuando se pasa el mouse sobre la notificación
+          <ToastContainer
+            position="bottom-left" 
+            autoClose={4000} 
+            hideProgressBar={false} 
+            newestOnTop={false} 
+            closeOnClick 
+            rtl={false} 
+            pauseOnFocusLoss 
+            pauseOnHover 
+            toastClassName="toast-container" // Aplica las clases personalizadas
+            bodyClassName="toast-body" 
           />
         </UserProvider>
       </Router>

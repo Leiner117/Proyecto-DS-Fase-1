@@ -40,6 +40,7 @@ const SearchRecipes = () => {
   }, [user]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (user) {
       fetchFavoriteRecipes();
     }

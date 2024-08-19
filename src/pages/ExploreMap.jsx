@@ -51,6 +51,7 @@ const ExploreMap = () => {
   const [validCountries, setValidCountries] = useState([]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     // Fetch the list of valid areas from the API
     fetch(mealDbUrl)
       .then((response) => response.json())

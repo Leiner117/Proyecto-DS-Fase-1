@@ -1,19 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
+import { auth, db } from '../firebaseConfig';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Spinner from '../components/Spinner';
 
 const ViewRecipe = () => {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const user = auth.currentUser;
 
   useEffect(() => {
+    // Scroll al inicio de la página al montar el componente
+    window.scrollTo(0, 0);
+
     const fetchRecipe = async () => {
       try {
         const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
         const data = await response.json();
         setRecipe(data.meals[0]);
         setLoading(false);
+
+        if (user) {
+          const favoriteDocRef = doc(db, "RecetasFavoritas", `${user.uid}_${id}`);
+          const docSnapshot = await getDoc(favoriteDocRef);
+          setIsFavorite(docSnapshot.exists());
+        }
       } catch (error) {
         console.error("Error fetching recipe:", error);
         setLoading(false);
@@ -21,10 +37,32 @@ const ViewRecipe = () => {
     };
 
     fetchRecipe();
-  }, [id]);
+  }, [id, user]);
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      toast.info("Must Sign in to use this feature!");
+      return;
+    }
+
+    try {
+      const favoriteDocRef = doc(db, "RecetasFavoritas", `${user.uid}_${id}`);
+      if (isFavorite) {
+        await deleteDoc(favoriteDocRef);
+        setIsFavorite(false);
+        toast.warn("Recipe deleted as favorite!");
+      } else {
+        await setDoc(favoriteDocRef, { recipeId: id, userId: user.uid });
+        setIsFavorite(true);
+        toast.success("Recipe added as favorite!");
+      }
+    } catch (error) {
+      toast.error("Error adding favorite recipe!");
+    }
+  };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
 
   if (!recipe) {
@@ -34,9 +72,7 @@ const ViewRecipe = () => {
   const ingredients = [];
   for (let i = 1; i <= 20; i++) {
     if (recipe[`strIngredient${i}`]) {
-      ingredients.push(
-        `${recipe[`strIngredient${i}`]} - ${recipe[`strMeasure${i}`]}`
-      );
+      ingredients.push(`${recipe[`strIngredient${i}`]} - ${recipe[`strMeasure${i}`]}`);
     }
   }
 
@@ -50,8 +86,11 @@ const ViewRecipe = () => {
           <Title>{recipe.strMeal}</Title>
           <Area>{recipe.strArea}</Area>
         </TitleArea>
+        <FavoriteButton isFavorite={isFavorite} onClick={toggleFavorite}>
+          {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+        </FavoriteButton>
         <Ingredients>
-          <h3>Ingredients:</h3>
+          <ObjectiveTitle>Ingredients:</ObjectiveTitle>
           <Table>
             <thead>
               <tr>
@@ -71,17 +110,17 @@ const ViewRecipe = () => {
               })}
             </tbody>
           </Table>
+          <ObjectiveTitle>Instructions:</ObjectiveTitle>
         </Ingredients>
         <Instructions>{recipe.strInstructions}</Instructions>
         {recipe.strYoutube && (
           <Video>
-            <h3>Video:</h3>
+            <ObjectiveTitle>Video:</ObjectiveTitle>
             <iframe
               width="100%"
               height="315"
               src={`https://www.youtube.com/embed/${recipe.strYoutube.split('v=')[1]}`}
               title={recipe.strMeal}
-              frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
@@ -127,28 +166,24 @@ const TitleArea = styled.div`
   margin-bottom: 20px;
 `;
 
-const Title = styled.h2`
+const Title = styled.h1`
   font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: #333;
+  color: #000000;
+  margin-bottom: 20px;
   text-align: center;
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
+`;
+
+const ObjectiveTitle = styled.h2`
+  font-size: 2rem;
+  color: #000000;
+  margin-bottom: 20px;
+  text-align: center;
 `;
 
 const Area = styled.p`
   font-size: 1.2rem;
   font-weight: bold;
   color: #666;
-  text-align: center;
-`;
-
-const Instructions = styled.p`
-  font-size: 18px;
-  line-height: 1.6;
-  text-align: left;
-  margin-top: 20px; /* Espacio entre ingredientes e instrucciones */
 `;
 
 const Ingredients = styled.div`
@@ -160,18 +195,18 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
-  margin-bottom: 20px; /* Espacio entre ingredientes e instrucciones */
+  margin-bottom: 20px;
 
   th, td {
     border: 1px solid #ddd;
-    padding: 12px; /* Aumenta el padding para más espacio */
+    padding: 12px;
     text-align: left;
   }
 
   th {
     background-color: #f2f2f2;
     font-weight: bold;
-    font-size: 1.1rem; /* Aumenta el tamaño de la fuente */
+    font-size: 1.1rem;
   }
 
   tr:nth-child(even) {
@@ -183,17 +218,34 @@ const Table = styled.table`
   }
 `;
 
+const Instructions = styled.p`
+  font-size: 18px;
+  line-height: 1.6;
+  text-align: left;
+  margin-top: 20px;
+`;
+
+const FavoriteButton = styled.button`
+  background-color: ${({ isFavorite }) => (isFavorite ? '#ba1c00' : '#f0a500')};
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: ${({ isFavorite }) => (isFavorite ? '#a00000' : '#d48000')};
+  }
+`;
+
 const Video = styled.div`
   margin-top: 20px;
+  padding: 20px;
 
   iframe {
     width: 100%;
     height: 315px;
-  }
-
-  a {
-    font-size: 18px;
-    color: blue;
-    text-decoration: underline;
   }
 `;

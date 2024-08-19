@@ -9,7 +9,8 @@ import 'react-toastify/dist/ReactToastify.css';
 const Card = ({ id, image, title, origin }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const user = auth.currentUser;
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook para navegar entre rutas
+
   useEffect(() => {
     const checkIfFavorite = async () => {
       if (user) {
@@ -22,7 +23,7 @@ const Card = ({ id, image, title, origin }) => {
   }, [user, id]);
 
   const toggleFavorite = async (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Evitar que el clic en el botón de favorito active la navegación
     if (!user) {
       toast.info("Must Sign in to use this feature!");
       return;
@@ -43,9 +44,11 @@ const Card = ({ id, image, title, origin }) => {
       toast.error("Error adding favorite recipe!");
     }
   };
+
   const handleCardClick = () => {
-    navigate(`/recipe/${id}`);
+    navigate(`/recipe/${id}`); // Redirigir a la página de detalles de la receta
   };
+
   return (
     <CardContainer onClick={handleCardClick}>
       <ImageContainer>
@@ -73,6 +76,7 @@ const CardContainer = styled.div`
   overflow: hidden;
   background: #e6e6e6;
   transition: transform 0.2s ease-in-out;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-10px);
