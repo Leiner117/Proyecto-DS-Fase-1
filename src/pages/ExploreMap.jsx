@@ -92,6 +92,7 @@ const ExploreMap = () => {
     setSelectedCountry('');
     setSelectedArea('');
     setRecipes([]);
+    window.scrollTo(0, 0);
   };
 
   return (

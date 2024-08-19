@@ -5,7 +5,8 @@ import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndP
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import accDefaultIcon from '../img/acc_icon.png';
+
+const DEFAULT_PROFILE_PICTURE_URL = "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/default-profile-picture-male-icon.png";
 
 const LoginAuth = () => {
   const [user, setUser] = useState(null);
@@ -18,8 +19,7 @@ const LoginAuth = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user && user.emailVerified) {
-        // Aplicar imagen de usuario por defecto si no tiene una.
-        const photoURL = user.photoURL || accDefaultIcon;
+        const photoURL = user.photoURL || DEFAULT_PROFILE_PICTURE_URL;
         setUser({ ...user, photoURL });
       } else {
         setUser(null);
@@ -47,10 +47,10 @@ const LoginAuth = () => {
       .then((userCredential) => {
         if (userCredential.user.emailVerified) {
           setUser(userCredential.user);
-          window.location.reload(); // Recargar la página al iniciar sesión
+          window.location.reload();
         } else {
           toast.error('Please verify your email before logging in.');
-          auth.signOut(); // Sign out the user if not verified
+          auth.signOut();
         }
       })
       .catch((error) => {
@@ -86,13 +86,13 @@ const LoginAuth = () => {
       .then((userCredential) => {
         updateProfile(userCredential.user, {
           displayName: name,
-          photoURL: accDefaultIcon, // Set default profile image
+          photoURL: DEFAULT_PROFILE_PICTURE_URL,
         }).then(() => {
           sendEmailVerification(userCredential.user)
             .then(() => {
               toast.success('Verification email sent. Please check your inbox and verify your email.');
-              clearFields(true); // Clear fields but keep the email
-              setIsRegistering(false); // Switch to sign-in mode after registration
+              clearFields(true);
+              setIsRegistering(false);
             })
             .catch((error) => {
               toast.error('Failed to send verification email.');
@@ -109,7 +109,7 @@ const LoginAuth = () => {
   const handleGoogleLogin = () => {
     signInWithGoogle()
       .then(() => {
-        window.location.reload(); // Recargar la página al iniciar sesión con Google
+        window.location.reload();
       })
       .catch((error) => {
         toast.error(error.message);
@@ -120,7 +120,7 @@ const LoginAuth = () => {
   const handleLogout = () => {
     logOut()
       .then(() => {
-        window.location.reload(); // Recargar la página al cerrar sesión
+        window.location.reload();
       })
       .catch((error) => {
         toast.error(error.message);
@@ -235,7 +235,7 @@ const UserInfo = styled.div`
     width: 100px;
     height: 100px;
     margin-bottom: 10px;
-    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+    object-fit: cover;
   }
 
   p {

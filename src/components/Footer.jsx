@@ -39,7 +39,7 @@ const Footer = () => {
 
         <Developer>
           <p>Walter Lazo</p>
-          <IconLink href="https://www.linkedin.com/in/walterl/" target="_blank" rel="noopener noreferrer">
+          <IconLink href="https://www.linkedin.com/in/walter-lazo-gonzález-76942b302" target="_blank" rel="noopener noreferrer">
             <img src={linkedinLogo} alt="LinkedIn" />
           </IconLink>
           <IconLink href="https://github.com/Walter-Lz" target="_blank" rel="noopener noreferrer">
