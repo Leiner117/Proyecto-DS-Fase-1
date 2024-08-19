@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { signInWithGoogle, logOut, auth } from '../firebaseConfig';
 import styled from 'styled-components';
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const DEFAULT_PROFILE_PICTURE_URL = "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/default-profile-picture-male-icon.png";
 
 const LoginAuth = () => {
   const [user, setUser] = useState(null);
@@ -10,12 +15,12 @@ const LoginAuth = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user && user.emailVerified) {
-        setUser(user);
+        const photoURL = user.photoURL || DEFAULT_PROFILE_PICTURE_URL;
+        setUser({ ...user, photoURL });
       } else {
         setUser(null);
       }
@@ -30,12 +35,11 @@ const LoginAuth = () => {
     setPassword('');
     setConfirmPassword('');
     setName('');
-    setError('');
   };
 
   const handleEmailLogin = () => {
     if (!email || !password) {
-      setError('Please fill in all fields.');
+      toast.error('Please fill in all fields.');
       return;
     }
 
@@ -43,37 +47,38 @@ const LoginAuth = () => {
       .then((userCredential) => {
         if (userCredential.user.emailVerified) {
           setUser(userCredential.user);
+          window.location.reload();
         } else {
-          setError('Please verify your email before logging in.');
-          auth.signOut(); // Sign out the user if not verified
+          toast.error('Please verify your email before logging in.');
+          auth.signOut();
         }
       })
       .catch((error) => {
-        setError(error.message);
+        toast.error(error.message);
         console.error("Error during email sign in:", error);
       });
   };
 
   const handleRegister = () => {
     if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields.');
+      toast.error('Please fill in all fields.');
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      toast.error('Passwords do not match.');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address.');
+      toast.error('Please enter a valid email address.');
       return;
     }
 
     const passwordRequirements = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     if (!passwordRequirements.test(password)) {
-      setError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
+      toast.error('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
       return;
     }
 
@@ -81,51 +86,65 @@ const LoginAuth = () => {
       .then((userCredential) => {
         updateProfile(userCredential.user, {
           displayName: name,
-          photoURL: 'https://www.pngkit.com/png/full/940-9406687_already-a-proact-user-employee-icon-white-png.png', // Set default profile image
+          photoURL: DEFAULT_PROFILE_PICTURE_URL,
         }).then(() => {
           sendEmailVerification(userCredential.user)
             .then(() => {
-              alert('Verification email sent. Please check your inbox and verify your email.');
-              clearFields(true); // Clear fields but keep the email
-              setIsRegistering(false); // Switch to sign-in mode after registration
+              toast.success('Verification email sent. Please check your inbox and verify your email.');
+              clearFields(true);
+              setIsRegistering(false);
             })
             .catch((error) => {
-              setError('Failed to send verification email.');
+              toast.error('Failed to send verification email.');
               console.error("Error during email verification:", error);
             });
         });
       })
       .catch((error) => {
-        setError(error.message);
+        toast.error(error.message);
         console.error("Error during registration:", error);
       });
   };
 
   const handleGoogleLogin = () => {
-    signInWithGoogle().catch((error) => {
-      console.error("Error during Google sign in:", error);
-    });
+    signInWithGoogle()
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        toast.error(error.message);
+        console.error("Error during Google sign in:", error);
+      });
   };
 
   const handleLogout = () => {
-    logOut().catch((error) => {
-      console.error("Error during sign out:", error);
-    });
+    logOut()
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        toast.error(error.message);
+        console.error("Error during sign out:", error);
+      });
   };
 
+  const navigate = useNavigate();
   const handleViewFavorites = () => {
-    console.log('Ver recetas favoritas');
+    navigate('/favoriterecipes');
   };
 
   return (
     <AuthContainer>
+      <ToastContainer />
       {user ? (
         <>
           <UserInfo>
             <img src={user.photoURL} alt="User Avatar" />
             <p>Welcome, {user.displayName}</p>
           </UserInfo>
-          <FavoritesButton onClick={handleViewFavorites}>My Favorite Recipes</FavoritesButton>
+          <FavoritesButton onClick={handleViewFavorites}>
+            My Favorite Recipes
+          </FavoritesButton>
           <Button onClick={handleLogout}>Logout</Button>
         </>
       ) : (
@@ -159,9 +178,10 @@ const LoginAuth = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm Password"
               />
-              {error && <ErrorText>{error}</ErrorText>}
               <Button onClick={handleRegister}>Sign Up</Button>
-              <ToggleText onClick={() => { setIsRegistering(false); clearFields(); }}>Already have an account? Sign In</ToggleText>
+              <ToggleText onClick={() => { setIsRegistering(false); clearFields(); }}>
+                Already have an account? Sign In
+              </ToggleText>
             </>
           ) : (
             <>
@@ -177,9 +197,10 @@ const LoginAuth = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
               />
-              {error && <ErrorText>{error}</ErrorText>}
               <Button onClick={handleEmailLogin}>Sign In</Button>
-              <ToggleText onClick={() => { setIsRegistering(true); clearFields(); }}>Don't have an account? Sign Up</ToggleText>
+              <ToggleText onClick={() => { setIsRegistering(true); clearFields(); }}>
+                Don't have an account? Sign Up
+              </ToggleText>
             </>
           )}
           <Separator>Other Ways to Sign In</Separator>
@@ -205,20 +226,23 @@ const AuthContainer = styled.div`
 
 const UserInfo = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
   margin-bottom: 15px;
 
   img {
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+    object-fit: cover;
   }
 
   p {
     margin: 0;
     font-weight: bold;
     color: white;
+    text-align: center;
   }
 `;
 
@@ -268,13 +292,6 @@ const ToggleText = styled.p`
   cursor: pointer;
   text-decoration: underline;
   margin-top: 10px;
-`;
-
-const ErrorText = styled.p`
-  color: red;
-  font-size: 0.9rem;
-  text-align: center;
-  margin-bottom: 10px;
 `;
 
 const Separator = styled.p`

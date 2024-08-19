@@ -5,7 +5,7 @@ import LoginAuth from './LoginAuth';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [language, setLanguage] = useState('Es');
+  const [language, setLanguage] = useState('En');
   const [showUserAuth, setShowUserAuth] = useState(false);
   const location = useLocation();
 
@@ -35,8 +35,8 @@ const Navbar = () => {
       </Hamburger>
       <Menu isOpen={isOpen}>
         <MenuLink to="/" isActive={location.pathname === '/'} onClick={closeMenu}>Home</MenuLink>
-        <MenuLink to="/explorarmapa" isActive={location.pathname === '/explorarmapa'} onClick={closeMenu}>Explore Map</MenuLink>
-        <MenuLink to="/buscarrecetas" isActive={location.pathname === '/buscarrecetas'} onClick={closeMenu}>Search Recipes</MenuLink>
+        <MenuLink to="/exploremap" isActive={location.pathname === '/exploremap'} onClick={closeMenu}>Explore Map</MenuLink>
+        <MenuLink to="/searchrecipes" isActive={location.pathname === '/searchrecipes'} onClick={closeMenu}>Search Recipes</MenuLink>
       </Menu>
       <RightSection>
         <LanguageSelector>
@@ -46,6 +46,7 @@ const Navbar = () => {
           >
             Es
           </LanguageOption>
+          |
           <LanguageOption 
             selected={language === 'En'} 
             onClick={() => handleLanguageChange('En')}
