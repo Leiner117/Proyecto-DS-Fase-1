@@ -6,8 +6,10 @@ import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from '../components/Spinner';
-
+import { useTranslation } from 'react-i18next';
+import {translateText} from '../api/deeplApi';
 const ViewRecipe = () => {
+  const { i18n } = useTranslation("global");
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,9 +24,16 @@ const ViewRecipe = () => {
       try {
         const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
         const data = await response.json();
-        setRecipe(data.meals[0]);
-        setLoading(false);
+        let recipeData = data.meals[0];
 
+        setRecipe(data.meals[0]);
+        
+        // Verifica el idioma actual y traduce si es necesario
+        if (i18n.language === 'es') {
+          recipeData = await translateRecipeData(recipeData);
+        }
+        setRecipe(recipeData);
+        setLoading(false);
         if (user) {
           const favoriteDocRef = doc(db, "RecetasFavoritas", `${user.uid}_${id}`);
           const docSnapshot = await getDoc(favoriteDocRef);
@@ -37,8 +46,27 @@ const ViewRecipe = () => {
     };
 
     fetchRecipe();
-  }, [id, user]);
+  }, [id, user, i18n.language]);
+  const translateRecipeData = async (recipeData) => {
+    const translatedRecipe = { ...recipeData };
 
+    // Traduce los ingredientes
+    for (let i = 1; i <= 20; i++) {
+      if (recipeData[`strIngredient${i}`]) {
+        translatedRecipe[`strIngredient${i}`] = await translateText(recipeData[`strIngredient${i}`], 'es');
+      }
+      if (recipeData[`strMeasure${i}`]) {
+        translatedRecipe[`strMeasure${i}`] = await translateText(recipeData[`strMeasure${i}`], 'es');
+      }
+    }
+
+    // Traduce las instrucciones
+    if (recipeData.strInstructions) {
+      translatedRecipe.strInstructions = await translateText(recipeData.strInstructions, 'es');
+    }
+
+    return translatedRecipe;
+  };
   const toggleFavorite = async () => {
     if (!user) {
       toast.info("Must Sign in to use this feature!");
@@ -90,12 +118,12 @@ const ViewRecipe = () => {
           {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
         </FavoriteButton>
         <Ingredients>
-          <ObjectiveTitle>Ingredients:</ObjectiveTitle>
+          <ObjectiveTitle>{i18n.t("ingredients")}:</ObjectiveTitle>
           <Table>
             <thead>
               <tr>
-                <th>Ingredient</th>
-                <th>Measure</th>
+                <th>{i18n.t("ingredient")}</th>
+                <th>{i18n.t("Measure")}</th>
               </tr>
             </thead>
             <tbody>
@@ -110,7 +138,7 @@ const ViewRecipe = () => {
               })}
             </tbody>
           </Table>
-          <ObjectiveTitle>Instructions:</ObjectiveTitle>
+          <ObjectiveTitle>{i18n.t("Instructions")}:</ObjectiveTitle>
         </Ingredients>
         <Instructions>{recipe.strInstructions}</Instructions>
         {recipe.strYoutube && (

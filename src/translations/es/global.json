@@ -24,7 +24,10 @@
     "select_ingredient": "Seleccionar un ingrediente",
     "exclude_ingredient": "Excluir ingrediente",
     "filter_category": "Filtrar por categoría",
-    "select_category": "Seleccionar una categoría"
-
+    "select_category": "Seleccionar una categoría",
+    "ingredients" : "Ingredientes",
+    "ingredient" : "Ingrediente",
+    "Measure": "Medidas",
+    "Instructions": "Instrucciones"
 
 }

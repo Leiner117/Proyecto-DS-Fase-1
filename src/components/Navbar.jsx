@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import LoginAuth from './LoginAuth'; 
 import { useTranslation } from 'react-i18next';
+import {translateText} from '../api/deeplApi';
 const Navbar = () => {
   const { i18n } = useTranslation("global");
   const [isOpen, setIsOpen] = useState(false);

@@ -24,7 +24,12 @@
     "select_ingredient": "Select an Ingredient",
     "exclude_ingredient": "Exclude Ingredient",
     "filter_category" : "Filter by Category",
-    "select_category": "Select a Category"
+    "select_category": "Select a Category",
+    "ingredients": "Ingredients",
+    "ingredient" : "Ingredient",
+    "Measure": "Measure",
+    "Instructions": "Instructions"
+
 
 
 
