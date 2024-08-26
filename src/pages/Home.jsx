@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Card from '../components/Card';
 import Spinner from '../components/Spinner';
-
+import { useTranslation } from 'react-i18next';
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { i18n } = useTranslation("global");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -51,7 +52,7 @@ const Home = () => {
 
   return (
     <HomeContainer>
-      <Title>Recommended Recipes</Title>
+      <Title>{i18n.t('recommended_recipes')}</Title>
       <CardSection>
         {recipes.map((recipe, index) => (
           <Card
@@ -64,15 +65,15 @@ const Home = () => {
         ))}
       </CardSection>
 
-      <ObjectiveTitle>About Us</ObjectiveTitle>
+      <ObjectiveTitle>{i18n.t('about_us')}</ObjectiveTitle>
       <Paragraph>
-        The idea of our site is to provide easy, quick, and healthy recipes for college students. We know that college life can be hectic, and often finding time to prepare a proper meal is a challenge. That's why we've put together a variety of recipes to fit busy schedules and limited budgets.
+        {i18n.t('about_us1')}
       </Paragraph>
       <Paragraph>
-        Our goal is to help students maintain a balanced diet by providing meal ideas that are not only nutritious but also easy to prepare. With our recipes, we hope to inspire students to experiment in the kitchen and discover that eating well doesn't have to be complicated or expensive.
+        {i18n.t('about_us2')}
       </Paragraph>
       <Paragraph>
-        Plus, many of our recipes are designed to be adaptable, which means they can be adjusted based on ingredients you have on hand or dietary preferences you may have. We love helping students eat well and feel good, no matter what their skill level in the kitchen!
+        {i18n.t('about_us3')}
       </Paragraph>
     </HomeContainer>
   );

@@ -1,0 +1,30 @@
+{
+    "about_us" : "Quiénes somos",
+    "recommended_recipes": "Recetas recomendadas",
+    "recipe_information provided_by": "Información de la recetas proporcionada por",
+    "developed by": "Desarrollado por",
+    "home": "Inicio",
+    "explore_map": "Explorar mapa",
+    "search_recipes": "Buscar recetas",
+    "about_us1" : "La idea de nuestro sitio es ofrecer recetas fáciles, rápidas y saludables para estudiantes universitarios. Sabemos que la vida universitaria puede ser agitada, y a menudo encontrar tiempo para preparar una comida adecuada es un desafío. Por eso hemos reunido una variedad de recetas que se ajustan a horarios ocupados y presupuestos limitados.",
+    "about_us2" : "Nuestro objetivo es ayudar a los estudiantes a mantener una dieta equilibrada proporcionando ideas de comidas que no solo sean nutritivas, sino también fáciles de preparar. Con nuestras recetas, esperamos inspirar a los estudiantes a experimentar en la cocina y descubrir que comer bien no tiene por qué ser complicado ni costoso.",
+    "about_us3" : "Además, muchas de nuestras recetas están diseñadas para ser adaptables, lo que significa que se pueden ajustar según los ingredientes que tengas a mano o las preferencias dietéticas que puedas tener. ¡Nos encanta ayudar a los estudiantes a comer bien y sentirse bien, sin importar su nivel de habilidad en la cocina!",
+    "Let's Explore the World's Recipes" : "Explora las recetas del mundo",
+    "Here are the recipes from" : "Aquí están las recetas de",
+    "clean_search": "Limpiar búsqueda",
+    "search_no_result": "Esta búsqueda no devolvió resultados",
+    "search_name": "Buscar recetas por nombre...",
+    "hide_search": "Ocultar búsqueda",
+    "show_search": "Mostrar búsqueda",
+    "search": "Buscar",
+    "view_all": "Ver todo",
+    "filter_area": "Filtrar por área",
+    "select_area": "Seleccionar un área",
+    "include_ingredient": "Incluir ingrediente",
+    "select_ingredient": "Seleccionar un ingrediente",
+    "exclude_ingredient": "Excluir ingrediente",
+    "filter_category": "Filtrar por categoría",
+    "select_category": "Seleccionar una categoría"
+
+
+}

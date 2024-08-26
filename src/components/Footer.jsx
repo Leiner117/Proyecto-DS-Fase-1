@@ -2,8 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import githubLogo from '../img/github.png';
 import linkedinLogo from '../img/linkedin.png';
-
+import { useTranslation } from 'react-i18next';
 const Footer = () => {
+  const { i18n } = useTranslation("global");
   return (
     <FooterContainer>
       <ApiSection>
@@ -11,12 +12,12 @@ const Footer = () => {
           <ApiLogo src="https://www.thesportsdb.com/images/logo-tmdb.png" alt="TheMealDB Logo" />
         </a>
         <ApiText>
-          Recipe information provided by <ApiLink href="https://www.themealdb.com/" target="_blank" rel="noopener noreferrer">TheMealDB</ApiLink>.
+          {i18n.t('recipe_information provided_by')} <ApiLink href="https://www.themealdb.com/" target="_blank" rel="noopener noreferrer">TheMealDB</ApiLink>.
         </ApiText>
       </ApiSection>
 
       <DeveloperSection>
-        <DevHeader>Developed by:</DevHeader>
+        <DevHeader>{i18n.t('developed by')}:</DevHeader>
         <Developer>
           <p>Kevin Jiménez</p>
           <IconLink href="https://linkedin.com/in/kvnjt" target="_blank" rel="noopener noreferrer">

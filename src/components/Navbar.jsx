@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import LoginAuth from './LoginAuth'; 
-
+import { useTranslation } from 'react-i18next';
 const Navbar = () => {
+  const { i18n } = useTranslation("global");
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState('En');
   const [showUserAuth, setShowUserAuth] = useState(false);
@@ -19,6 +20,7 @@ const Navbar = () => {
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
+    i18n.changeLanguage(lang.toLowerCase());
     closeMenu();
   };
 
@@ -34,9 +36,9 @@ const Navbar = () => {
         <span />
       </Hamburger>
       <Menu isOpen={isOpen}>
-        <MenuLink to="/" isActive={location.pathname === '/'} onClick={closeMenu}>Home</MenuLink>
-        <MenuLink to="/exploremap" isActive={location.pathname === '/exploremap'} onClick={closeMenu}>Explore Map</MenuLink>
-        <MenuLink to="/searchrecipes" isActive={location.pathname === '/searchrecipes'} onClick={closeMenu}>Search Recipes</MenuLink>
+        <MenuLink to="/" isActive={location.pathname === '/'} onClick={closeMenu}>{i18n.t('home')}</MenuLink>
+        <MenuLink to="/exploremap" isActive={location.pathname === '/exploremap'} onClick={closeMenu}>{i18n.t('explore_map')}</MenuLink>
+        <MenuLink to="/searchrecipes" isActive={location.pathname === '/searchrecipes'} onClick={closeMenu}>{i18n.t('search_recipes')}</MenuLink>
       </Menu>
       <RightSection>
         <LanguageSelector>

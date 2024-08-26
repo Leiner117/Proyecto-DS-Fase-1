@@ -1,0 +1,31 @@
+{
+    "about_us" : "About Us",
+    "recommended_recipes": "Recommended Recipes",
+    "recipe_information provided_by": "Recipe Information Provided By",
+    "developed by": "Developed by",
+    "home": "Home",
+    "explore_map": "Explore Map",
+    "search_recipes": "Search Recipes",
+    "about_us1" : "The idea of our site is to provide easy, quick, and healthy recipes for college students. We know that college life can be hectic, and often finding time to prepare a proper meal is a challenge. That's why we've put together a variety of recipes to fit busy schedules and limited budgets.",
+    "about_us2" : "Our goal is to help students maintain a balanced diet by providing meal ideas that are not only nutritious but also easy to prepare. With our recipes, we hope to inspire students to experiment in the kitchen and discover that eating well doesn't have to be complicated or expensive.",
+    "about_us3" : "Plus, many of our recipes are designed to be adaptable, which means they can be adjusted based on ingredients you have on hand or dietary preferences you may have. We love helping students eat well and feel good, no matter what their skill level in the kitchen!",
+    "Let's Explore the World's Recipes" : "Let's Explore the World's Recipes",
+    "Here are the recipes from" : "Here are the recipes from",
+    "clean_search" : "Clean Search",
+    "search_no_result" : "This search returned no results",
+    "search_name" : "Search Recipes by Name...",
+    "hide_search" : "Hide Search",
+    "show_search" : "Show Search",
+    "search" : "Search",
+    "view_all" : "View All",
+    "filter_area": "Filter by Area",
+    "select_area" : "Select an Area",
+    "include_ingredient" : "Include Ingredient",
+    "select_ingredient": "Select an Ingredient",
+    "exclude_ingredient": "Exclude Ingredient",
+    "filter_category" : "Filter by Category",
+    "select_category": "Select a Category"
+
+
+
+}

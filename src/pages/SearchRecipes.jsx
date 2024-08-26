@@ -5,8 +5,10 @@ import { auth, db } from '../firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Card from '../components/Card';
 import Spinner from '../components/Spinner';
+import { useTranslation } from 'react-i18next';
 
 const SearchRecipes = () => {
+  const { i18n } = useTranslation("global");
   const [search, setSearch] = useState('');
   const [areaFilter, setAreaFilter] = useState('');
   const [includeIngredient, setIncludeIngredient] = useState('');
@@ -151,7 +153,7 @@ const SearchRecipes = () => {
   
       if (allRecipes.length === 0) {
         setFilteredRecipes([]);
-        toast.info("This search returned no results.");
+        toast.info(i18n.t("search_no_result"));
       } else {
         setFilteredRecipes(allRecipes);
       }
@@ -199,7 +201,7 @@ const SearchRecipes = () => {
   
       if (filtered.length === 0) {
         setFilteredRecipes([]);
-        toast.info("This search returned no results.");
+        toast.info(i18n.t("search_no_result"));
       } else {
         setFilteredRecipes(filtered);
       }
@@ -245,7 +247,7 @@ const SearchRecipes = () => {
   
         if (filtered.length === 0) {
           setFilteredRecipes([]);
-          toast.info("This search returned no results.");
+          toast.info(i18n.t("search_no_result"));
         } else {
           setFilteredRecipes(filtered);
         }
@@ -279,60 +281,60 @@ const SearchRecipes = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Search Recipes by Name..."
+          placeholder={i18n.t('search_name')}
         />
-        <button type="button" onClick={handleSearch}>Search</button>
+        <button type="button" onClick={handleSearch}>{i18n.t("search")}</button>
         <button type="button" onClick={handleToggleAdvancedSearch}>
-          {showAdvancedSearch ? 'Hide Advanced Search' : 'Show Advanced Search'}
+          {showAdvancedSearch ? i18n.t('hide_search') : i18n.t('show_search')}
         </button>
-        <button type="button" onClick={viewAllRecipes}>View All</button>
+        <button type="button" onClick={viewAllRecipes}>{i18n.t("view_all")}</button>
       </SearchForm>
 
       {showAdvancedSearch && (
         <AdvancedSearchForm>
           <FilterGroup>
-            <label>Filter by Area:</label>
+            <label>{i18n.t("filter_area")}:</label>
             <select
               value={areaFilter}
               onChange={(e) => setAreaFilter(e.target.value)}
             >
-              <option value="">Select an Area</option>
+              <option value="">{i18n.t("select_area")}:</option>
               {areas.map((area, index) => (
                 <option key={index} value={area}>{area}</option>
               ))}
             </select>
           </FilterGroup>
           <FilterGroup>
-            <label>Include Ingredient:</label>
+            <label>{i18n.t("include_ingredient")}:</label>
             <select
               value={includeIngredient}
               onChange={(e) => setIncludeIngredient(e.target.value)}
             >
-              <option value="">Select an Ingredient</option>
+              <option value="">{i18n.t("select_ingredient")}:</option>
               {ingredients.map((ingredient, index) => (
                 <option key={index} value={ingredient}>{ingredient}</option>
               ))}
             </select>
           </FilterGroup>
           <FilterGroup>
-            <label>Exclude Ingredient:</label>
+            <label>{i18n.t("exclude_ingredient")}:</label>
             <select
               value={excludeIngredient}
               onChange={(e) => setExcludeIngredient(e.target.value)}
             >
-              <option value="">Select an Ingredient</option>
+              <option value="">{i18n.t("select_ingredient")}:</option>
               {ingredients.map((ingredient, index) => (
                 <option key={index} value={ingredient}>{ingredient}</option>
               ))}
             </select>
           </FilterGroup>
           <FilterGroup>
-            <label>Filter by Category:</label>
+            <label>{i18n.t("filter_category")}:</label>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
             >
-              <option value="">Select a Category</option>
+              <option value="">{i18n.t("select_category")}</option>
               {categories.map((category, index) => (
                 <option key={index} value={category}>{category}</option>
               ))}

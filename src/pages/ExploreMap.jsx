@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import Modal from 'react-modal';
 import Card from '../components/Card'; // Asegúrate de que el componente Card esté en la ruta correcta
 import Spinner from '../components/Spinner';
-
+import { useTranslation } from 'react-i18next';
+import i18next from 'i18next';
 Modal.setAppElement('#root');
 
 const geoUrl = 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson';
@@ -43,6 +44,7 @@ const areaToCountryMap = {
 };
 
 const ExploreMap = () => {
+  const { i18n } = useTranslation("global");
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedArea, setSelectedArea] = useState('');
   const [recipes, setRecipes] = useState([]);
@@ -97,7 +99,7 @@ const ExploreMap = () => {
 
   return (
     <div>
-      <Title>Let's Explore the World's Recipes:</Title>
+      <Title>{i18next.t("Let's Explore the World's Recipes")}:</Title>
       
       <MapContainer>
         <ComposableMap>
@@ -145,7 +147,7 @@ const ExploreMap = () => {
       
       {recipes.length > 0 && (
         <div>
-          <ObjectiveTitle>Here are the recipes from {selectedCountry}:</ObjectiveTitle>
+          <ObjectiveTitle>{i18n.t("Here are the recipes from")} {selectedCountry}:</ObjectiveTitle>
           <Gallery>
             {recipes.map((recipe) => (
               <Card
@@ -157,7 +159,7 @@ const ExploreMap = () => {
               />
             ))}
           </Gallery>
-          <Button onClick={handleCleanSearch}>Clean Search</Button>
+          <Button onClick={handleCleanSearch}>{i18n.t("clean_search")}</Button>
         </div>
       )}
     </div>
