@@ -5,10 +5,11 @@ import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndP
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import i18next from 'i18next';
 const DEFAULT_PROFILE_PICTURE_URL = "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/default-profile-picture-male-icon.png";
 
 const LoginAuth = () => {
+  const { i18n } = useTranslation("global");
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,7 +40,7 @@ const LoginAuth = () => {
 
   const handleEmailLogin = () => {
     if (!email || !password) {
-      toast.error('Please fill in all fields.');
+      toast.error(i18n.t('fill_in_fields'));
       return;
     }
 
@@ -49,36 +50,36 @@ const LoginAuth = () => {
           setUser(userCredential.user);
           window.location.reload();
         } else {
-          toast.error('Please verify your email before logging in.');
+          toast.error(i18n.t('verify_email'));
           auth.signOut();
         }
       })
       .catch((error) => {
         toast.error(error.message);
-        console.error("Error during email sign in:", error);
+        console.error(i18n.t("error_email")+":", error);
       });
   };
 
   const handleRegister = () => {
     if (!name || !email || !password || !confirmPassword) {
-      toast.error('Please fill in all fields.');
+      toast.error(i18n.t('fill_in_fields'));
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match.');
+      toast.error(i18n.t('passwords_not_match'));
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error('Please enter a valid email address.');
+      toast.error(i18n.t('invalid_email'));
       return;
     }
 
     const passwordRequirements = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     if (!passwordRequirements.test(password)) {
-      toast.error('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
+      toast.error(i18n.t('password_lenght'));
       return;
     }
 
@@ -90,12 +91,12 @@ const LoginAuth = () => {
         }).then(() => {
           sendEmailVerification(userCredential.user)
             .then(() => {
-              toast.success('Verification email sent. Please check your inbox and verify your email.');
+              toast.success(i18n.t('verification_email_sent'));
               clearFields(true);
               setIsRegistering(false);
             })
             .catch((error) => {
-              toast.error('Failed to send verification email.');
+              toast.error(i18n.t('error_email_verification'));
               console.error("Error during email verification:", error);
             });
         });
@@ -140,12 +141,12 @@ const LoginAuth = () => {
         <>
           <UserInfo>
             <img src={user.photoURL} alt="User Avatar" />
-            <p>Welcome, {user.displayName}</p>
+            <p>{i18n.t('Welcome')}, {user.displayName}</p>
           </UserInfo>
           <FavoritesButton onClick={handleViewFavorites}>
-            My Favorite Recipes
+            {i18n.t('favorite_recipes')}
           </FavoritesButton>
-          <Button onClick={handleLogout}>Logout</Button>
+          <Button onClick={handleLogout}>{i18n.t('logout')}</Button>
         </>
       ) : (
         <>
@@ -155,32 +156,32 @@ const LoginAuth = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Name"
+                placeholder={i18n.t('name')}
               />
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
+                placeholder={i18n.t('email')}
               />
               <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                placeholder={i18n.t('password')}
               />
               <PasswordRequirements>
-                Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.
+                {i18n.t('password_requirements')}
               </PasswordRequirements>
               <Input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm Password"
+                placeholder={i18n.t('confirm_password')}
               />
-              <Button onClick={handleRegister}>Sign Up</Button>
+              <Button onClick={handleRegister}>{i18n.t("sign_up")}</Button>
               <ToggleText onClick={() => { setIsRegistering(false); clearFields(); }}>
-                Already have an account? Sign In
+                {i18n.t('sign_in_have_account')}
               </ToggleText>
             </>
           ) : (
@@ -189,22 +190,22 @@ const LoginAuth = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
+                placeholder={i18n.t('email')}
               />
               <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                placeholder={i18n.t('password')}
               />
-              <Button onClick={handleEmailLogin}>Sign In</Button>
+              <Button onClick={handleEmailLogin}>{i18n.t('sign_in')}</Button>
               <ToggleText onClick={() => { setIsRegistering(true); clearFields(); }}>
-                Don't have an account? Sign Up
+                {i18n.t('sign_up_dont_have_account')}
               </ToggleText>
             </>
           )}
-          <Separator>Other Ways to Sign In</Separator>
-          <Button onClick={handleGoogleLogin}>Sign in with Google</Button>
+          <Separator>{i18n.t(other_ways_sign_in)}</Separator>
+          <Button onClick={handleGoogleLogin}>{i18n.t('sign_with_google')}</Button>
         </>
       )}
     </AuthContainer>

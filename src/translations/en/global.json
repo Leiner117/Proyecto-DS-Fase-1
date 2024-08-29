@@ -28,9 +28,28 @@
     "ingredients": "Ingredients",
     "ingredient" : "Ingredient",
     "Measure": "Measure",
-    "Instructions": "Instructions"
-
-
-
+    "Instructions": "Instructions",
+    "fill_in_fields": "Please fill in all fields",
+    "verify_email": "Please verify your email before logging in.",
+    "error_email":"Error during email sign in",
+    "passwords_not_match": "Passwords do not match.",
+    "valid_email": "Please enter a valid email address.",
+    "password_lenght":"Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.",
+    "verification_email_sent":"Verification email sent. Please check your inbox and verify your email.",
+    "failed_verification_email":"Failed to send verification email.",
+    "welcome": "Welcome",
+    "favorite_recipes":"My Favorite Recipes",
+    "logout":"Logout",
+    "name":"Name",
+    "email":"Email",
+    "password":"Password",
+    "confirm_password":"Confirm Password",
+    "password_requeriments":"Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.",
+    "sign_up":"Sign Up",
+    "sign_in_have_account":"Already have an account? Sign In",
+    "sign_in":"Sign In",
+    "sign_up_dont_have_account":"Don't have an account? Sign Up",
+    "other_ways_sign_in":"Other Ways to Sign In",
+    "sign_with_google":"Sign in with Google"
 
 }

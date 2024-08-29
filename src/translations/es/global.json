@@ -28,6 +28,29 @@
     "ingredients" : "Ingredientes",
     "ingredient" : "Ingrediente",
     "Measure": "Medidas",
-    "Instructions": "Instrucciones"
+    "Instructions": "Instrucciones",
+    "fill_in_fields": "Por favor, complete todos los campos",
+    "verify_email": "Por favor, verifique su correo electrónico antes de iniciar sesión.",
+    "error_email": "Error durante el inicio de sesión con correo electrónico",
+    "passwords_not_match": "Las contraseñas no coinciden.",
+    "valid_email": "Por favor, introduzca una dirección de correo electrónico válida.",
+    "password_lenght": "La contraseña debe tener al menos 8 caracteres y contener al menos una letra mayúscula, una letra minúscula y un número.",
+    "verification_email_sent": "Correo de verificación enviado. Por favor, revise su bandeja de entrada y verifique su correo electrónico.",
+    "failed_verification_email": "Error al enviar el correo de verificación.",
+    "welcome": "Bienvenido",
+    "favorite_recipes": "Mis recetas favoritas",
+    "logout": "Cerrar sesión",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirm_password": "Confirmar contraseña",
+    "password_requeriments": "La contraseña debe tener al menos 8 caracteres y contener al menos una letra mayúscula, una letra minúscula y un número.",
+    "sign_up": "Registrarse",
+    "sign_in_have_account": "¿Ya tienes una cuenta? Iniciar sesión",
+    "sign_in": "Iniciar sesión",
+    "sign_up_dont_have_account": "¿No tienes una cuenta? Registrarse",
+    "other_ways_sign_in": "Otras formas de iniciar sesión",
+    "sign_with_google": "Iniciar sesión con Google"
+
 
 }
