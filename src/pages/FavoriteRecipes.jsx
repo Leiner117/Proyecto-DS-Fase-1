@@ -4,8 +4,9 @@ import { auth, db } from '../firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Card from '../components/Card';
 import Spinner from '../components/Spinner'; 
-
+import { useTranslation } from 'react-i18next';
 const FavoriteRecipes = () => {
+  const { i18n } = useTranslation("global");
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
@@ -76,7 +77,7 @@ const FavoriteRecipes = () => {
       {user && (
         <UserInfo>
           <UserAvatar src={user.photoURL} alt="User Avatar" />
-          <h3>{user.displayName}! These are your favorite recipes:</h3>
+          <h3>{user.displayName}! {i18n.t('are_your_favorite_recipes')}:</h3>
         </UserInfo>
       )}
       <RecipesList>
@@ -91,7 +92,7 @@ const FavoriteRecipes = () => {
             />
           ))
         ) : (
-          <NoRecipesMessage>You have no favorite recipes.</NoRecipesMessage>
+          <NoRecipesMessage>{i18n.t('no_favorite_recipes')}</NoRecipesMessage>
         )}
       </RecipesList>
     </FavoriteRecipesContainer>

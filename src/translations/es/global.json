@@ -50,7 +50,9 @@
     "sign_in": "Iniciar sesión",
     "sign_up_dont_have_account": "¿No tienes una cuenta? Registrarse",
     "other_ways_sign_in": "Otras formas de iniciar sesión",
-    "sign_with_google": "Iniciar sesión con Google"
+    "sign_with_google": "Iniciar sesión con Google",
+    "are_your_favorite_recipes": "Estas son tus recetas favoritas",
+    "no_favorite_recipes": "No tienes recetas favoritas."
 
 
 }

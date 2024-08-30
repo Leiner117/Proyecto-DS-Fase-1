@@ -141,7 +141,7 @@ const LoginAuth = () => {
         <>
           <UserInfo>
             <img src={user.photoURL} alt="User Avatar" />
-            <p>{i18n.t('Welcome')}, {user.displayName}</p>
+            <p>{i18n.t('welcome')}, {user.displayName}</p>
           </UserInfo>
           <FavoritesButton onClick={handleViewFavorites}>
             {i18n.t('favorite_recipes')}
