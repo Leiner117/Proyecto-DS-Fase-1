@@ -204,7 +204,7 @@ const LoginAuth = () => {
               </ToggleText>
             </>
           )}
-          <Separator>{i18n.t(other_ways_sign_in)}</Separator>
+          <Separator>{i18n.t('other_ways_sign_in')}</Separator>
           <Button onClick={handleGoogleLogin}>{i18n.t('sign_with_google')}</Button>
         </>
       )}
