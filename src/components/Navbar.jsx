@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import LoginAuth from './LoginAuth'; 
 import { useTranslation } from 'react-i18next';
 import {translateText} from '../api/deeplApi';
+import userLogin from '../img/user.png';
+
 const Navbar = () => {
   const { i18n } = useTranslation("global");
   const [isOpen, setIsOpen] = useState(false);
@@ -58,7 +60,7 @@ const Navbar = () => {
           </LanguageOption>
         </LanguageSelector>
         <LoginIcon onClick={toggleUserAuth}> {}
-          <img src="https://www.pngkit.com/png/full/940-9406687_already-a-proact-user-employee-icon-white-png.png" alt="Login Icon" />
+          <img src={userLogin} alt="Login Icon" />
         </LoginIcon>
         {showUserAuth && <LoginAuth />} {}
       </RightSection>
